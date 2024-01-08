@@ -191,7 +191,7 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 from dba_scheduler_jobs j
 order by owner, job_name]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Running jobs]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -206,7 +206,7 @@ from DBA_SCHEDULER_RUNNING_JOBS
 order by owner, job_name]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Job run details]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -219,23 +219,9 @@ order by owner, job_name]]></sql>
 from DBA_SCHEDULER_JOB_RUN_DETAILS
 where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Job log]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -250,7 +236,7 @@ where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Global attribute]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -264,7 +250,7 @@ from DBA_SCHEDULER_GLOBAL_ATTRIBUTE
 order by ATTRIBUTE_NAME]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Instance parameters]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -279,7 +265,7 @@ order by ATTRIBUTE_NAME]]></sql>
 order by isdefault, name]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Chart" enable="true">
+		<display id="null" type="" style="Chart" enable="true">
 			<name><![CDATA[Job duration and CPU]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -343,22 +329,7 @@ abs( extract( second from CPU_USED )
 from DBA_SCHEDULER_JOB_RUN_DETAILS j
 where 
   (OWNER=:OWNER and JOB_name=:JOB_NAME) 
-  --(OWNER='SKOME' and JOB_name='DBMS_JOB$_1') 
 order by LOG_DATE]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
 	</display>
