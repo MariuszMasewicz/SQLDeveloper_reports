@@ -330,6 +330,20 @@ from DBA_SCHEDULER_JOB_RUN_DETAILS j
 where 
   (OWNER=:OWNER and JOB_name=:JOB_NAME) 
 order by LOG_DATE]]></sql>
+				<binds>
+					<bind id="OWNER">
+						<prompt><![CDATA[OWNER]]></prompt>
+						<tooltip><![CDATA[OWNER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="JOB_NAME">
+						<prompt><![CDATA[JOB_NAME]]></prompt>
+						<tooltip><![CDATA[JOB_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 	</display>
@@ -355,6 +369,680 @@ from gv$session_longops
 where sofar<>totalwork 
 order by inst_id, sid, serial#]]></sql>
 		</query>
+	</display>
+	<display id="ea0dfa57-018c-1000-8030-ac120052d4bc" type="" style="Table" enable="true">
+		<name><![CDATA[Autotasks]]></name>
+		<description><![CDATA[Details on 11g Autotasks (Stats and Advisors)]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[SELECT *
+  FROM dba_autotask_client]]></sql>
+		</query>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[History]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select *
+  FROM dba_autotask_job_history
+ where client_name like :CLIENT_NAME
+ ORDER BY job_start_time DESC]]></sql>
+				<binds>
+					<bind id="CLIENT_NAME">
+						<prompt><![CDATA[CLIENT_NAME]]></prompt>
+						<tooltip><![CDATA[CLIENT_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Job History]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT *
+  FROM dba_autotask_job_history
+ WHERE client_name = :CLIENT_NAME
+ ORDER BY job_start_time DESC]]></sql>
+				<binds>
+					<bind id="CLIENT_NAME">
+						<prompt><![CDATA[CLIENT_NAME]]></prompt>
+						<tooltip><![CDATA[CLIENT_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Window History]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT *
+  FROM dba_autotask_window_history
+ ORDER BY window_start_time DESC]]></sql>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Program]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[vertical]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT * FROM DBA_SCHEDULER_PROGRAMS
+ WHERE UPPER( program_name ) IN ( SELECT UPPER( TASK_NAME ) FROM dba_autotask_task WHERE client_name = :CLIENT_NAME )]]></sql>
+				<binds>
+					<bind id="CLIENT_NAME">
+						<prompt><![CDATA[CLIENT_NAME]]></prompt>
+						<tooltip><![CDATA[CLIENT_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Tasks]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT *
+  FROM dba_autotask_task
+ WHERE client_name = :CLIENT_NAME]]></sql>
+				<binds>
+					<bind id="CLIENT_NAME">
+						<prompt><![CDATA[CLIENT_NAME]]></prompt>
+						<tooltip><![CDATA[CLIENT_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+	</display>
+	<display id="ea0e2821-018c-1000-8031-ac120052d4bc" type="" style="plsql-dbms_output" enable="true">
+		<name><![CDATA[Log Switch Heat Map]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[-- David Mann
+-- http://ba6.us
+-- 24-JUL-2012
+
+-- Archived Log Heat Map for past 31 Days
+-- Requires access to v$archived_log
+-- Spool output to file and view with browser 
+-- or use SQL Developer PL/SQL DBMS_OUTPUT report type
+
+-- I tried to use a scripted stylesheet but SQL Dev wouldn't cooperate so
+-- that is my excuse for all of the ugly inline CSS. For now :) 
+
+DECLARE
+  -- How many days of log history to show?
+  myHist CONSTANT NUMBER := 31;
+  ----------------------------------------
+  myMax NUMBER;
+  myDBName VARCHAR2(16);
+
+  FUNCTION DataCell ( P_Value NUMBER, P_Max NUMBER) RETURN VARCHAR2 IS
+   myReturn VARCHAR2(128);
+   myColorVal NUMBER;
+   myColorHex VARCHAR2(16);
+  BEGIN
+
+    myColorVal := ROUND( 255-FLOOR(255 * (P_VALUE / P_MAX)));
+    myColorHex := LPAD(TRIM(TO_CHAR(myColorVal, 'XX')) ,2,'0');
+    
+    IF P_Value = P_Max THEN
+      myColorHex := '00';
+    END IF;
+    
+
+    myReturn := '<TD STYLE="background-color: #FF'||
+                myColorHex||
+                myColorHex||
+                '; font-family: monospace">'||P_Value||'</TD>';
+
+
+    RETURN myReturn;
+  END DataCell;
+
+BEGIN
+
+  DBMS_OUTPUT.ENABLE(100000);
+
+  SELECT ROUND(MAX(COUNT(*)))
+    INTO myMax
+    FROM v$log_history 
+  WHERE trunc(FIRST_TIME) >= trunc(sysdate - myHist)
+  GROUP BY TO_CHAR(first_time,'YYYY-MM-DD HH24');
+  
+  SELECT NAME INTO myDBName FROM V$DATABASE;
+
+  DBMS_OUTPUT.PUT_LINE('<HTML>');
+  DBMS_OUTPUT.PUT_LINE('<H1>Archived Log Heat Map - '||myDBName||'  - Past 31 days</H1>');
+  DBMS_OUTPUT.PUT_LINE('<TABLE>');
+  DBMS_OUTPUT.PUT_LINE('<TR>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">Date / Hour</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">00</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">01</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">02</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">03</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">04</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">05</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">06</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">07</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">08</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">09</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">10</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">11</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">12</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">13</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">14</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">15</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">16</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">17</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">18</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">19</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">20</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">21</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">22</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">23</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TR>');
+
+  FOR cur IN (
+
+    select trunc(first_time) AS Day,
+    sum(DECODE(to_char(first_time, 'HH24'), '00', 1, 0)) AS "00",
+    sum(DECODE(to_char(first_time, 'HH24'), '01', 1, 0)) AS "01",
+    sum(DECODE(to_char(first_time, 'HH24'), '02', 1, 0)) AS "02",
+    sum(DECODE(to_char(first_time, 'HH24'), '03', 1, 0)) AS "03",
+    sum(DECODE(to_char(first_time, 'HH24'), '04', 1, 0)) AS "04",
+    sum(DECODE(to_char(first_time, 'HH24'), '05', 1, 0)) AS "05",
+    sum(DECODE(to_char(first_time, 'HH24'), '06', 1, 0)) AS "06",
+    sum(DECODE(to_char(first_time, 'HH24'), '07', 1, 0)) AS "07",
+    sum(DECODE(to_char(first_time, 'HH24'), '08', 1, 0)) AS "08",
+    sum(DECODE(to_char(first_time, 'HH24'), '09', 1, 0)) AS "09",
+    sum(DECODE(to_char(first_time, 'HH24'), '10', 1, 0)) AS "10",
+    sum(DECODE(to_char(first_time, 'HH24'), '11', 1, 0)) AS "11",
+    sum(DECODE(to_char(first_time, 'HH24'), '12', 1, 0)) AS "12",
+    sum(DECODE(to_char(first_time, 'HH24'), '13', 1, 0)) AS "13",
+    sum(DECODE(to_char(first_time, 'HH24'), '14', 1, 0)) AS "14",
+    sum(DECODE(to_char(first_time, 'HH24'), '15', 1, 0)) AS "15",
+    sum(DECODE(to_char(first_time, 'HH24'), '16', 1, 0)) AS "16",
+    sum(DECODE(to_char(first_time, 'HH24'), '17', 1, 0)) AS "17",
+    sum(DECODE(to_char(first_time, 'HH24'), '18', 1, 0)) AS "18",
+    sum(DECODE(to_char(first_time, 'HH24'), '19', 1, 0)) AS "19",
+    sum(DECODE(to_char(first_time, 'HH24'), '20', 1, 0)) AS "20",
+    sum(DECODE(to_char(first_time, 'HH24'), '21', 1, 0)) AS "21",
+    sum(DECODE(to_char(first_time, 'HH24'), '22', 1, 0)) AS "22",
+    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23"
+    FROM v$log_history
+    WHERE trunc(FIRST_TIME) >= trunc(sysdate - myHist)
+    GROUP BY trunc(first_time)
+    ORDER BY TRUNC(FIRST_TIME) DESC
+  )
+  LOOP
+    DBMS_OUTPUT.PUT_LINE('<TR>');
+    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||TO_CHAR(cur.Day,'DD-MON-YYYY')||'<EM></TD>');
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."00", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."01", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."02", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."03", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."04", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."05", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."06", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."07", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."08", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."09", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."10", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."11", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."12", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."13", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."14", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."15", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."16", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."17", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."18", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."19", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."20", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."21", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."22", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."23", myMax) );
+    DBMS_OUTPUT.PUT_LINE('</TR>');
+  END LOOP;
+
+  DBMS_OUTPUT.PUT_LINE('</TABLE>');
+  DBMS_OUTPUT.PUT_LINE('</HTML>');
+
+
+END;]]></sql>
+		</query>
+	</display>
+	<display id="ea0ee2e6-018c-1000-8032-ac120052d4bc" type="" style="plsql-dbms_output" enable="true">
+		<name><![CDATA[DBMS_STATS Report]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[DECLARE  
+  l_offset     INT := 1;
+  l_theclob    CLOB;
+BEGIN
+  dbms_output.enable(1000000);
+  select SYS.DBMS_STATS.REPORT_STATS_OPERATIONS(
+         since => systimestamp - 1
+       , until => systimestamp
+       , detail_level => 'ALL'
+       , format => 'HTML' ) as report
+    into l_theclob
+    from dual;
+  loop  
+        exit when l_offset > dbms_lob.getlength(l_theclob);  
+        dbms_output.put_line( dbms_lob.substr( l_theclob, 255, l_offset ) );  
+        l_offset := l_offset + 255;  
+  end loop;  
+END;]]></sql>
+		</query>
+	</display>
+	<display id="ea0ff3b7-018c-1000-8034-ac120052d4bc" type="" style="Chart" enable="true">
+		<name><![CDATA[FRA]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<Y1AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y1AXIS_SCALE_INCREMENT>
+			<DATA_MAP_COLNAMES><![CDATA[\,"Claimed","Reclaimable","Unused"]]></DATA_MAP_COLNAMES>
+			<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+			<STYLE><![CDATA[Default]]></STYLE>
+			<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+			<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+			<PLOT_SERIES_OPTIONS_COLOR><![CDATA[\,-16737997,-3394816,-6710887,-16751002,-26368]]></PLOT_SERIES_OPTIONS_COLOR>
+			<XAXIS_SCALE_INCREMENT><![CDATA[20.0]]></XAXIS_SCALE_INCREMENT>
+			<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+			<PLOT_DATALABELS_SLICE_TYPE><![CDATA[PERCENT_VALUE]]></PLOT_DATALABELS_SLICE_TYPE>
+			<PLOT_DATALABELS_SLICE_POSITION><![CDATA[OUTSIDE_SLICE_LINE]]></PLOT_DATALABELS_SLICE_POSITION>
+			<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+			<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+			<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+			<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+			<TYPE><![CDATA[RING]]></TYPE>
+			<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+			<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+			<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+			<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select NULL "FRA", 'Reclaimable' AS attr, ROUND(space_reclaimable/1024/1024/1024, 2) GB
+  from v$recovery_file_dest def
+union all
+select NULL "FRA", 'Claimed', ROUND((space_used - space_reclaimable)/1024/1024/1024, 2)
+  from v$recovery_file_dest def
+union all
+select NULL "FRA", 'Unused', ROUND((space_limit - space_used)/1024/1024/1024, 2)
+  from v$recovery_file_dest def]]></sql>
+		</query>
+	</display>
+	<display id="ea111e7e-018c-1000-8035-ac120052d4bc" type="" style="Table" enable="true">
+		<name><![CDATA[LongOps-Gauge]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[SELECT 'SQLDEV:GAUGE:0:100:0:100:'
+       || DECODE( sofar, NULL, 100,
+          DECODE( totalwork, 0, 100, NULL, sofar, ROUND(sofar/totalwork*100,0))) as progress
+     , username, elapsed_seconds "Elapsed/s", time_remaining "Remaining/s", message
+     , sid, serial#, NVL( sql_id, '[NULL]' ) AS sql_id
+     , to_char(last_update_time, 'yyyy-mm-dd hh24:mi:ss') last_update_time
+  FROM gv$session_longops
+ WHERE 1=1
+--   AND sofar <> totalwork         -- if you want to see active operations only
+ ORDER BY SIGN( sofar - NVL( totalwork, 0 )), last_update_time DESC
+ --target, sid]]></sql>
+		</query>
+		<query>
+			<sql><![CDATA[SELECT 'SQLDEV:GAUGE:0:100:0:100:'
+       || DECODE( sofar, NULL, 100,
+          DECODE( totalwork, 0, 100, NULL, sofar, ROUND(sofar/totalwork*100,0))) as progress
+     , username, elapsed_seconds "Elapsed/s", time_remaining "Remaining/s", message
+     , sid, serial#
+     , sql_hash_value
+     --, NVL( sql_id, '[NULL]' ) AS sql_id
+     , to_char(last_update_time, 'yyyy-mm-dd hh24:mi:ss') last_update_time
+  FROM gv$session_longops
+ WHERE 1=1
+--   AND sofar <> totalwork         -- if you want to see active operations only
+ ORDER BY SIGN( sofar - NVL( totalwork, 0 )), last_update_time DESC
+ --target, sid]]></sql>
+		</query>
+		<query>
+			<sql><![CDATA[SELECT 'SQLDEV:GAUGE:0:100:0:100:'
+       || DECODE( sofar, NULL, 100,
+          DECODE( totalwork, 0, 100, NULL, sofar, ROUND(sofar/totalwork*100,0))) as progress
+     , username, elapsed_seconds "Elapsed/s", time_remaining "Remaining/s", message
+     , sid, serial#
+     , sql_hash_value
+     , sql_address
+     , to_char(last_update_time, 'yyyy-mm-dd hh24:mi:ss') last_update_time
+  FROM gv$session_longops
+ WHERE 1=1
+--   AND sofar <> totalwork         -- if you want to see active operations only
+ ORDER BY SIGN( sofar - NVL( totalwork, 0 )), last_update_time DESC
+ --target, sid]]></sql>
+		</query>
+		<query>
+			<sql><![CDATA[SELECT 'SQLDEV:GAUGE:0:100:0:100:'
+       || DECODE( sofar, NULL, 100,
+          DECODE( totalwork, 0, 100, NULL, sofar, ROUND(sofar/totalwork*100,0))) as progress
+     , username, elapsed_seconds "Elapsed/s", time_remaining "Remaining/s", message
+     , sid, serial#, NVL( sql_id, '[NULL]' ) AS sql_id
+     , to_char(last_update_time, 'yyyy-mm-dd hh24:mi:ss') last_update_time
+     , sql_exec_start, sql_plan_line_id, sql_exec_id
+  FROM gv$session_longops
+ WHERE 1=1
+--   AND sofar <> totalwork         -- if you want to see active operations only
+ ORDER BY SIGN( sofar - NVL( totalwork, 0 )), last_update_time DESC
+ --target, sid]]></sql>
+		</query>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Session Detail]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[vertical]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT *
+  FROM gv$session
+ WHERE sid = :SID
+   AND serial# = :SERIAL#]]></sql>
+				<binds>
+					<bind id="SID">
+						<prompt><![CDATA[SID]]></prompt>
+						<tooltip><![CDATA[SID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SERIAL#">
+						<prompt><![CDATA[SERIAL#]]></prompt>
+						<tooltip><![CDATA[SERIAL#]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Wait Summary]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT s.username
+     , se.event
+     , SUM( total_waits ) total_waits
+     , ROUND( SUM( time_waited )/100, 2 ) "Time waited / s"
+     , AVG( average_wait )*10 "avg_wait / ms"
+     , MAX( se.wait_class ) wait_class
+  FROM gv$session_event se
+     , gv$session s
+ WHERE s.sid      = :SID
+   AND s.serial#  = :SERIAL#
+   AND se.sid     = s.sid
+   AND se.inst_id = s.inst_id
+--   AND se.wait_class <> 'Idle'
+--   AND s.username IS NOT NULL
+ GROUP BY s.username, se.event
+ ORDER BY MAX( DECODE( se.wait_class, 'Idle', 1, 0 )), "Time waited / s" DESC]]></sql>
+				<binds>
+					<bind id="SID">
+						<prompt><![CDATA[SID]]></prompt>
+						<tooltip><![CDATA[SID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SERIAL#">
+						<prompt><![CDATA[SERIAL#]]></prompt>
+						<tooltip><![CDATA[SERIAL#]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[SQL-Detail]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[vertical]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * from gv$sql where SQL_ID = :SQL_ID]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+			<query>
+				<sql><![CDATA[select * from gv$sql where HASH_VALUE = :SQL_HASH_VALUE]]></sql>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Explain Plan]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[-- Displays SQL plans from all cluster nodes when on RAC.
+-- Captured while still in memory. Metrics below are for ALL executions of each child cursor.
+-- If STATISTICS_LEVEL was set to ALL at the time of the hard-parse then A-Rows column is populated.
+SELECT RPAD('Inst: '||v.inst_id, 9)||' '||RPAD('Child: '||v.child_number, 11) inst_child, t.plan_table_output
+  FROM gv$sql v
+     , TABLE( DBMS_XPLAN.DISPLAY('gv$sql_plan_statistics_all', NULL, 'ADVANCED ALLSTATS ALL'
+            , 'inst_id = '||v.inst_id||' AND sql_id = '''||v.sql_id||''' AND child_number = '||v.child_number)) t
+ WHERE v.sql_id = NVL( :SQL_ID, 'NULL!' )
+   AND v.loaded_versions > 0]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+			<query>
+				<sql><![CDATA[SELECT child_number, id , lpad (' ', depth) || operation operation , options , object_name , optimizer , cost
+  FROM V$SQL_PLAN 
+ WHERE hash_value = :SQL_HASH_VALUE
+   AND address = :SQL_ADDRESS
+ ORDER BY child_number, id]]></sql>
+			</query>
+		</display>
+		<display id="" type="" style="Code" enable="true">
+			<name><![CDATA[SQL-Monitor (Text)]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT CASE WHEN :SQL_ID = '[NULL]' THEN TO_CLOB( 'SQL_ID IS NULL' )
+       ELSE dbms_sqltune.report_sql_monitor( type=>'TEXT', sql_id => :SQL_ID
+          , SESSION_ID => :SID, SESSION_SERIAL => :SERIAL#, SQL_EXEC_ID => :SQL_EXEC_ID )
+       END AS report
+  FROM dual]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SID">
+						<prompt><![CDATA[SID]]></prompt>
+						<tooltip><![CDATA[SID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SERIAL#">
+						<prompt><![CDATA[SERIAL#]]></prompt>
+						<tooltip><![CDATA[SERIAL#]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SQL_EXEC_ID">
+						<prompt><![CDATA[SQL_EXEC_ID]]></prompt>
+						<tooltip><![CDATA[SQL_EXEC_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="plsql-dbms_output" enable="true">
+			<name><![CDATA[SQL-Monitor (HTML)]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[DECLARE
+  l_report CLOB := dbms_sqltune.report_sql_monitor( type=>'HTML', sql_id => :SQL_ID
+    , SESSION_ID => :SID, SESSION_SERIAL => :SERIAL#, SQL_EXEC_ID => :SQL_EXEC_ID );
+  l_offset PLS_INTEGER := 1;
+  l_length PLS_INTEGER := NVL(dbms_lob.getlength(l_report),0);
+  l_chunk CONSTANT PLS_INTEGER := 8191;
+BEGIN
+  dbms_output.enable(NULL);
+  --dbms_output.put_line('Len: '||l_length);
+  WHILE l_offset < l_length LOOP
+    --dbms_output.put_line('Off: '||l_offset);
+    dbms_output.put_line(dbms_lob.substr( l_report, l_chunk, l_offset));
+    l_offset := l_offset + l_chunk;
+  END LOOP;
+  --dbms_output.put_line('');
+END;]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SID">
+						<prompt><![CDATA[SID]]></prompt>
+						<tooltip><![CDATA[SID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SERIAL#">
+						<prompt><![CDATA[SERIAL#]]></prompt>
+						<tooltip><![CDATA[SERIAL#]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SQL_EXEC_ID">
+						<prompt><![CDATA[SQL_EXEC_ID]]></prompt>
+						<tooltip><![CDATA[SQL_EXEC_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[SQL-Monitor (Flash)]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT CASE WHEN :SQL_ID = '[NULL]' THEN TO_CLOB( 'SQL_ID IS NULL' )
+       ELSE dbms_sqltune.report_sql_monitor( type=>'EM', sql_id => :SQL_ID
+          , SESSION_ID => :SID, SESSION_SERIAL => :SERIAL#, SQL_EXEC_ID => :SQL_EXEC_ID )
+       END AS report
+  FROM dual]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SID">
+						<prompt><![CDATA[SID]]></prompt>
+						<tooltip><![CDATA[SID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SERIAL#">
+						<prompt><![CDATA[SERIAL#]]></prompt>
+						<tooltip><![CDATA[SERIAL#]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="SQL_EXEC_ID">
+						<prompt><![CDATA[SQL_EXEC_ID]]></prompt>
+						<tooltip><![CDATA[SQL_EXEC_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
 	</display>
 </folder>
 </displays>
