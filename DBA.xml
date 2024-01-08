@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<displays>
+<folder>
+	<name><![CDATA[DBA]]></name>
+	<tooltip><![CDATA[]]></tooltip>
+	<description><![CDATA[]]></description>
+		<display id="e925b2bd-018c-1000-800d-ac120052d4bc" type="" style="Table" enable="true">
+		<name><![CDATA[ASM]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select --INST_ID, GROUP_NUMBER, NAME, SECTOR_SIZE, LOGICAL_SECTOR_SIZE, BLOCK_SIZE, ALLOCATION_UNIT_SIZE, STATE, TYPE, TOTAL_MB, FREE_MB, HOT_USED_MB, COLD_USED_MB, REQUIRED_MIRROR_FREE_MB, USABLE_FILE_MB, OFFLINE_DISKS, COMPATIBILITY, DATABASE_COMPATIBILITY, VOTING_FILES, CON_ID
+*
+from gv$asm_diskgroup]]></sql>
+		</query>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Disks]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from v$asm_disk 
+where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Files]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from gv$asm_alias a join gv$asm_file f on a.file_number=f.file_number 
+where a.GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null 
+order by bytes desc]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Disk stats]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$ASM_DISK_STAT
+where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Disk IO stats]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$ASM_DISK_IOSTAT
+where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Client]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$ASM_CLIENT
+where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Diskgroup stats]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$ASM_DISKGROUP_STAT
+where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Template]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$ASM_TEMPLATE
+where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+	</display>
+	<display id="e9970c1f-018c-1000-802d-ac120052d4bc" type="" style="Table" enable="true">
+		<name><![CDATA[Scheduler]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select j.*,
+'exec DBMS_SCHEDULER.enable(name=>''"'||owner||'"."'||job_name||'"'');' enable_job,
+'exec DBMS_SCHEDULER.disable(name=>''"'||owner||'"."'||job_name||'"'', force => TRUE);' disable_job,
+'exec DBMS_SCHEDULER.RUN_JOB(name=>''"'||owner||'"."'||job_name||'"'', USE_CURRENT_SESSION => FALSE);' run_job,
+'exec DBMS_SCHEDULER.STOP_JOB(name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE);' stop_job,
+'exec DBMS_SCHEDULER.DROP_JOB(name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE, defer => TRUE);' drop_job
+from dba_scheduler_jobs j
+order by owner, job_name]]></sql>
+		</query>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Running jobs]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from DBA_SCHEDULER_RUNNING_JOBS
+--where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
+order by owner, job_name]]></sql>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Job run details]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from DBA_SCHEDULER_JOB_RUN_DETAILS
+where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
+order by LOG_ID desc --,LOG_DATE desc]]></sql>
+				<binds>
+					<bind id="OWNER">
+						<prompt><![CDATA[OWNER]]></prompt>
+						<tooltip><![CDATA[OWNER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="JOB_NAME">
+						<prompt><![CDATA[JOB_NAME]]></prompt>
+						<tooltip><![CDATA[JOB_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Job log]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from DBA_SCHEDULER_JOB_LOG
+where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
+order by LOG_ID desc --,LOG_DATE desc]]></sql>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Global attribute]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from DBA_SCHEDULER_GLOBAL_ATTRIBUTE
+order by ATTRIBUTE_NAME]]></sql>
+			</query>
+		</display>
+		<display id="" type="" style="Table" enable="true">
+			<name><![CDATA[Instance parameters]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT * FROM GV$PARAMETER
+--where 
+--name like 'job%'
+order by isdefault, name]]></sql>
+			</query>
+		</display>
+		<display id="" type="" style="Chart" enable="true">
+			<name><![CDATA[Job duration and CPU]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<Y1AXIS_TITLE_TEXT><![CDATA[[s]]]></Y1AXIS_TITLE_TEXT>
+				<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+				<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+				<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+				<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+				<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+				<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+				<Y1AXIS_REFOBJ_COUNT><![CDATA[0]]></Y1AXIS_REFOBJ_COUNT>
+				<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+				<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+				<Y1AXIS_REFOBJ_LINE_VALUE><![CDATA[\]]></Y1AXIS_REFOBJ_LINE_VALUE>
+				<DATA_MAP_COLUMNS><![CDATA[\,"ACTUAL_START_DATE","ACTUAL_START_DATE",]]></DATA_MAP_COLUMNS>
+				<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
+				<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+				<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+				<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+				<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+				<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+				<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
+				<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+				<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+				<Y1AXIS_REFOBJ_VISIBLE><![CDATA[\]]></Y1AXIS_REFOBJ_VISIBLE>
+				<DATA_MAP_COLNAMES><![CDATA[\,"ACTUAL_START_DATE","ADDITIONAL_INFO","BINARY_ERRORS","BINARY_OUTPUT","CPU_USED","CPU_USED_SEC","CREDENTIAL_NAME","CREDENTIAL_OWNER","DESTINATION","DESTINATION_OWNER","ERROR#","ERRORS","INSTANCE_ID","JOB_NAME","JOB_SUBNAME","LOG_DATE","LOG_ID","OUTPUT","OWNER","REQ_START_DATE","RUN_DURATION","RUN_DURATION_SEC","SESSION_ID","SLAVE_PID","STATUS"]]></DATA_MAP_COLNAMES>
+				<DATA_MAP_SERIES><![CDATA[\,DURATION,CPU,]]></DATA_MAP_SERIES>
+				<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+				<DATA_MAP_COUNT><![CDATA[3]]></DATA_MAP_COUNT>
+				<STYLE><![CDATA[Default]]></STYLE>
+				<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+				<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+				<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+				<XAXIS_TITLE><![CDATA[false]]></XAXIS_TITLE>
+				<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+				<DATA_MAP_VALUES><![CDATA[\,"RUN_DURATION_SEC","CPU_USED_SEC",]]></DATA_MAP_VALUES>
+				<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+				<Y1AXIS_REFOBJ_TEXT><![CDATA[\]]></Y1AXIS_REFOBJ_TEXT>
+				<Y1AXIS_REFOBJ_WIDTH><![CDATA[\]]></Y1AXIS_REFOBJ_WIDTH>
+				<Y1AXIS_TITLE><![CDATA[true]]></Y1AXIS_TITLE>
+				<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+				<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+				<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+				<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+				<Y1AXIS_REFOBJ_COLOR><![CDATA[\]]></Y1AXIS_REFOBJ_COLOR>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select j.*, 
+abs( extract( second from RUN_DURATION ) 
+          + extract( minute from RUN_DURATION ) * 60 
+          + extract( hour from RUN_DURATION ) * 60 * 60 
+          + extract( day from RUN_DURATION ) * 60 * 60 * 24
+            ) as RUN_DURATION_SEC,
+abs( extract( second from CPU_USED ) 
+          + extract( minute from CPU_USED ) * 60 
+          + extract( hour from CPU_USED ) * 60 * 60 
+          + extract( day from CPU_USED ) * 60 * 60 * 24
+            ) as CPU_USED_SEC
+from DBA_SCHEDULER_JOB_RUN_DETAILS j
+where 
+  (OWNER=:OWNER and JOB_name=:JOB_NAME) 
+  --(OWNER='SKOME' and JOB_name='DBMS_JOB$_1') 
+order by LOG_DATE]]></sql>
+				<binds>
+					<bind id="OWNER">
+						<prompt><![CDATA[OWNER]]></prompt>
+						<tooltip><![CDATA[OWNER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="JOB_NAME">
+						<prompt><![CDATA[JOB_NAME]]></prompt>
+						<tooltip><![CDATA[JOB_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+	</display>
+	<display id="e9974232-018c-1000-802e-ac120052d4bc" type="" style="Table" enable="true">
+		<name><![CDATA[Longops]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select sysdate, 
+       inst_id, 
+       sid, 
+       serial#, 
+       OPNAME,
+       sofar,
+       decode(totalwork,0,9999999999,totalwork) as totalwork, 
+       trunc((sofar/decode(totalwork,0,9999999999,totalwork))*100) as percent_done, 
+       round(TIME_REMAINING/60,1) as "MINUTES_REMAINING"  
+from gv$session_longops 
+where sofar<>totalwork 
+order by inst_id, sid, serial#]]></sql>
+		</query>
+	</display>
+</folder>
+</displays>
