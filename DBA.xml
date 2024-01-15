@@ -742,6 +742,39 @@ union all
 select NULL "FRA", 'Unused', ROUND((space_limit - space_used)/1024/1024/1024, 2)
   from v$recovery_file_dest def]]></sql>
 		</query>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[FRASummary]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select name, ROUND(SPACE_LIMIT/1024/1024/1024,2) "Space Limit (GB)", 
+round(SPACE_USED/1024/1024/1024,2) "Used Space(GB)",
+decode(nvl(space_used,0),0,0,round((space_used/space_limit) * 100)) pct_used,
+round(SPACE_RECLAIMABLE/1024/1024/1024,2) "SPACE_RECLAIMABLE (GB)" ,
+(select round(ESTIMATED_FLASHBACK_SIZE/1024/1024/1024,2) 
+from V$FLASHBACK_DATABASE_LOG) "Estimated Space (GB)",
+number_of_files as "Number of files"
+from V$RECOVERY_FILE_DEST]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[FRAUsage]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from v$flash_recovery_area_usage
+order by percent_space_used desc]]></sql>
+			</query>
+		</display>
 	</display>
 	<display id="ea111e7e-018c-1000-8035-ac120052d4bc" type="" style="Table" enable="true">
 		<name><![CDATA[LongOps-Gauge]]></name>
@@ -1134,6 +1167,14 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
   FROM dba_temp_files
 where TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL
 ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
+				<binds>
+					<bind id="TABLESPACE_LOGGROUP">
+						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
+						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="null" type="" style="Table" enable="true">
@@ -1149,6 +1190,14 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
   FROM v$log
 where (VALIDATE_CONVERSION(:TABLESPACE_LOGGROUP AS NUMBER) = 1) and ( group#= to_number(:TABLESPACE_LOGGROUP) OR :TABLESPACE_LOGGROUP IS NULL)
 ORDER BY group#, thread#]]></sql>
+				<binds>
+					<bind id="TABLESPACE_LOGGROUP">
+						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
+						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="null" type="" style="Table" enable="true">
@@ -1164,6 +1213,14 @@ ORDER BY group#, thread#]]></sql>
   FROM v$logfile
 where (VALIDATE_CONVERSION(:TABLESPACE_LOGGROUP AS NUMBER) = 1) and ( group#= to_number(:TABLESPACE_LOGGROUP) OR :TABLESPACE_LOGGROUP IS NULL)
 ORDER BY group#, MEMBER]]></sql>
+				<binds>
+					<bind id="TABLESPACE_LOGGROUP">
+						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
+						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="null" type="" style="plsql-dbms_output" enable="true">
