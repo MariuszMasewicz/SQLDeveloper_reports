@@ -1441,5 +1441,339 @@ from GV$DIAG_TRACE_FILE]]></sql>
 			</query>
 		</display>
 	</display>
+	<display id="1a264ca7-018d-1000-8009-0abcf0220279" type="" style="Table" enable="true">
+		<name><![CDATA[SQL]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select --s.sql_id, 
+       s.* from gv$sql s
+--order by sql_id]]></sql>
+		</query>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[CursorPlan_all]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select *
+   from 
+   table(dbms_xplan.display_cursor(:SQL_ID,
+                                  :CHILD_NUMBER, 'ALL')) t
+where :SQL_ID is not null]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="CHILD_NUMBER">
+						<prompt><![CDATA[CHILD_NUMBER]]></prompt>
+						<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[CursorPlan_adaptive]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select *
+   from 
+   table(dbms_xplan.display_cursor(:SQL_ID,
+                                  :CHILD_NUMBER, 'ADAPTIVE')) t
+where :SQL_ID is not null]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLBindCapture]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_BIND_CAPTURE s 
+--left join GV$SQL_BIND_METADATA m on utl_raw.compare(s.address,m.address)=0
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by s.POSITION]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLCsHistogram]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_CS_HISTOGRAM s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by bucket_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLOptimizerEnv]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_OPTIMIZER_ENV s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLPLanStatistics]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_PLAN_STATISTICS s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+--order by id]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="CHILD_NUMBER">
+						<prompt><![CDATA[CHILD_NUMBER]]></prompt>
+						<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLPLanStatisticsAll]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_PLAN_STATISTICS_ALL s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLRedirection]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select u.username, s.* 
+from GV$SQL_REDIRECTION s join all_users u on s.PARSING_USER_ID=u.USER_ID
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLReoptimizatioHints]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_REOPTIMIZATION_HINTS s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by hint_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLSharedCursor]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_SHARED_CURSOR s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+--order by id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLWorkarea]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_WORKAREA s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by operation_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLWorkareaActive]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_WORKAREA_ACTIVE s 
+where (s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER) or (:SQL_ID is null and :CHILD_NUMBER is null)
+order by operation_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLWorkareaHistogram]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQL_WORKAREA_HISTOGRAM
+order by 1,2]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLArea]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQLAREA s 
+where s.sql_id=:SQL_ID or :SQL_ID is null
+--order by operation_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLAreaPlanHash]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQLAREA_PLAN_HASH s 
+where s.sql_id=:SQL_ID  or :SQL_ID is null
+--order by operation_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLStats]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQLSTATS s 
+where s.sql_id=:SQL_ID  or :SQL_ID is null]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLStatsPlanHash]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQLSTATS_PLAN_HASH s 
+where s.sql_id=:SQL_ID  or :SQL_ID is null]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLText]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQLTEXT s 
+where s.sql_id=:SQL_ID  or :SQL_ID is null
+order by piece]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[SQLTextWithNewlines]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from GV$SQLTEXT_WITH_NEWLINES s 
+where s.sql_id=:SQL_ID  or :SQL_ID is null
+order by piece]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+		</display>
+	</display>
 </folder>
 </displays>
