@@ -17,7 +17,7 @@
 *
 from gv$asm_diskgroup]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Disks]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -27,19 +27,11 @@ from gv$asm_diskgroup]]></sql>
 			</CustomValues>
 			<query>
 				<sql><![CDATA[select * 
-from v$asm_disk 
-where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-				<binds>
-					<bind id="GROUP_NUMBER">
-						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
+from gv$asm_disk a
+--where a.GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Files]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -62,7 +54,7 @@ order by bytes desc]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Disk stats]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -84,7 +76,7 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Disk IO stats]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -106,7 +98,7 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Client]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -128,7 +120,7 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Diskgroup stats]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -140,17 +132,9 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_DISKGROUP_STAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-				<binds>
-					<bind id="GROUP_NUMBER">
-						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Template]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -162,14 +146,6 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_TEMPLATE
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-				<binds>
-					<bind id="GROUP_NUMBER">
-						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
 	</display>
@@ -191,7 +167,7 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 from dba_scheduler_jobs j
 order by owner, job_name]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Running jobs]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -206,7 +182,7 @@ from DBA_SCHEDULER_RUNNING_JOBS
 order by owner, job_name]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Job run details]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -219,23 +195,9 @@ order by owner, job_name]]></sql>
 from DBA_SCHEDULER_JOB_RUN_DETAILS
 where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Job log]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -248,23 +210,9 @@ order by LOG_ID desc --,LOG_DATE desc]]></sql>
 from DBA_SCHEDULER_JOB_LOG
 where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Global attribute]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -278,7 +226,7 @@ from DBA_SCHEDULER_GLOBAL_ATTRIBUTE
 order by ATTRIBUTE_NAME]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Instance parameters]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -293,7 +241,7 @@ order by ATTRIBUTE_NAME]]></sql>
 order by isdefault, name]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Chart" enable="true">
+		<display id="null" type="" style="Chart" enable="true">
 			<name><![CDATA[Job duration and CPU]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -358,20 +306,34 @@ from DBA_SCHEDULER_JOB_RUN_DETAILS j
 where 
   (OWNER=:OWNER and JOB_name=:JOB_NAME) 
 order by LOG_DATE]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[AutoTasks]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select a.* ,
+'exec DBMS_AUTO_TASK_ADMIN.ENABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as enable,
+'exec DBMS_AUTO_TASK_ADMIN.DISABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as disable
+from DBA_AUTOTASK_CLIENT a]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[AutoStatsExecutions]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from DBA_AUTO_STAT_EXECUTIONS]]></sql>
 			</query>
 		</display>
 	</display>
@@ -605,6 +567,7 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">21</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">22</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">23</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">24h</TD>');
   DBMS_OUTPUT.PUT_LINE('<TR>');
 
   FOR cur IN (
@@ -633,7 +596,8 @@ BEGIN
     sum(DECODE(to_char(first_time, 'HH24'), '20', 1, 0)) AS "20",
     sum(DECODE(to_char(first_time, 'HH24'), '21', 1, 0)) AS "21",
     sum(DECODE(to_char(first_time, 'HH24'), '22', 1, 0)) AS "22",
-    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23"
+    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23",
+    count(*) AS "24h"
     FROM v$log_history
     WHERE trunc(FIRST_TIME) >= trunc(sysdate - myHist)
     GROUP BY trunc(first_time)
@@ -641,7 +605,8 @@ BEGIN
   )
   LOOP
     DBMS_OUTPUT.PUT_LINE('<TR>');
-    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||TO_CHAR(cur.Day,'DD-MON-YYYY')||'<EM></TD>');
+    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||
+                          TO_CHAR(cur.Day,'YYYY-MM-DD:D')||'<EM></TD>');
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."00", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."01", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."02", myMax) );
@@ -666,6 +631,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."21", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."22", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."23", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."24h", myMax) );
     DBMS_OUTPUT.PUT_LINE('</TR>');
   END LOOP;
 
@@ -1131,7 +1097,7 @@ SELECT 'Controlfiles' typ, 'Controlfile' Tablespace_LogGroup, ROUND( BLOCK_SIZE*
 GROUP BY ROLLUP(typ, Tablespace_LogGroup)
 order by typ, Tablespace_LogGroup, GB desc]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[DataFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1154,7 +1120,7 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[TempFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1167,17 +1133,9 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
   FROM dba_temp_files
 where TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL
 ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
-				<binds>
-					<bind id="TABLESPACE_LOGGROUP">
-						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
-						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[LogGroups]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1190,17 +1148,9 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
   FROM v$log
 where (VALIDATE_CONVERSION(:TABLESPACE_LOGGROUP AS NUMBER) = 1) and ( group#= to_number(:TABLESPACE_LOGGROUP) OR :TABLESPACE_LOGGROUP IS NULL)
 ORDER BY group#, thread#]]></sql>
-				<binds>
-					<bind id="TABLESPACE_LOGGROUP">
-						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
-						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[LogFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1213,17 +1163,9 @@ ORDER BY group#, thread#]]></sql>
   FROM v$logfile
 where (VALIDATE_CONVERSION(:TABLESPACE_LOGGROUP AS NUMBER) = 1) and ( group#= to_number(:TABLESPACE_LOGGROUP) OR :TABLESPACE_LOGGROUP IS NULL)
 ORDER BY group#, MEMBER]]></sql>
-				<binds>
-					<bind id="TABLESPACE_LOGGROUP">
-						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
-						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="plsql-dbms_output" enable="true">
+		<display id="null" type="" style="plsql-dbms_output" enable="true">
 			<name><![CDATA[LogSwitchHeatMap]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1314,6 +1256,7 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">21</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">22</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">23</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">24h</TD>');
   DBMS_OUTPUT.PUT_LINE('<TR>');
 
   FOR cur IN (
@@ -1342,7 +1285,8 @@ BEGIN
     sum(DECODE(to_char(first_time, 'HH24'), '20', 1, 0)) AS "20",
     sum(DECODE(to_char(first_time, 'HH24'), '21', 1, 0)) AS "21",
     sum(DECODE(to_char(first_time, 'HH24'), '22', 1, 0)) AS "22",
-    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23"
+    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23",
+    count(*) AS "24h"
     FROM v$log_history
     WHERE trunc(FIRST_TIME) >= trunc(sysdate - myHist)
     GROUP BY trunc(first_time)
@@ -1350,7 +1294,8 @@ BEGIN
   )
   LOOP
     DBMS_OUTPUT.PUT_LINE('<TR>');
-    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||TO_CHAR(cur.Day,'YYYY-MM-DD')||'<EM></TD>');
+    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||
+                          TO_CHAR(cur.Day,'YYYY-MM-DD:D')||'<EM></TD>');
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."00", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."01", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."02", myMax) );
@@ -1375,6 +1320,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."21", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."22", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."23", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."24h", myMax) );
     DBMS_OUTPUT.PUT_LINE('</TR>');
   END LOOP;
 
@@ -1385,7 +1331,7 @@ BEGIN
 END;]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[LogSwitchHistory]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1399,7 +1345,7 @@ from gv$log_history
 order by sequence# desc]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[ArchivedLogs]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1413,7 +1359,7 @@ GV$ARCHIVED_LOG
 order by recid desc]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[ControlFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1427,7 +1373,7 @@ order by recid desc]]></sql>
 ORDER by name]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[DiagTraceFile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1774,7 +1720,7 @@ order by piece]]></sql>
 from GV$DIAG_INFO
 order by INST_ID,NAME]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DiagAlertExt]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1788,7 +1734,7 @@ from   v$diag_alert_ext
 order by ORIGINATING_TIMESTAMP desc]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DiagAppTraceFile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1802,7 +1748,7 @@ from GV$DIAG_APP_TRACE_FILE
 order by MODIFY_TIME desc]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DiagDirExt]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1815,7 +1761,7 @@ order by MODIFY_TIME desc]]></sql>
 from V$DIAG_DIR_EXT]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DiagTraceFile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1829,7 +1775,7 @@ from GV$DIAG_TRACE_FILE
 order by MODIFY_TIME desc]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DiagTraceFileContents]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
