@@ -727,8 +727,8 @@ union all
 select NULL "FRA", 'Unused', ROUND((space_limit - space_used)/1024/1024/1024, 2)
   from v$recovery_file_dest def]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[FRASummary]]></name>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[FRA Summary]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
 			<drillclass><![CDATA[]]></drillclass>
@@ -746,8 +746,8 @@ number_of_files as "Number of files"
 from V$RECOVERY_FILE_DEST]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[FRAUsage]]></name>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[FRA Usage]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
 			<drillclass><![CDATA[]]></drillclass>
@@ -758,6 +758,21 @@ from V$RECOVERY_FILE_DEST]]></sql>
 				<sql><![CDATA[select * 
 from v$flash_recovery_area_usage
 order by percent_space_used desc]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[FRA Parameters]]></name>
+			<description><![CDATA[select * 
+from gv$parameter 
+where name like 'db_recovery%'
+order by inst_id, name]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[]]></sql>
 			</query>
 		</display>
 	</display>
@@ -1834,68 +1849,15 @@ from V$DIAG_TRACE_FILE_CONTENTS
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
 		<query>
-			<sql><![CDATA[SELECT /*+  RULE */
-         DISTINCT
-          SESS.inst_id,
-          SESS.sid,
-         SESS.SERIAL#,
-         SESS.logon_time,
-         sess.status,
-         SESS.LAST_CALL_ET,
-         ROUND (SM.ELAPSED_TIME / 1e6, 0) "DURATION",
-         SM.FETCHES,
-            TO_CHAR (FLOOR (sess.last_call_et / 86400), '999')
-         || ' d '
-         || TRIM (
-               TO_CHAR (FLOOR (MOD (sess.last_call_et, 86400) / 3600), '00'))
-         || ' hr '
-         || TRIM (TO_CHAR (FLOOR (MOD (sess.last_call_et, 3600) / 60), '00'))
-         || ' min '
-            DUR,
-         SESS.machine,
-         SESS.PROCESS "PROCESS",
-         NVL (SESS.sql_id, sm.sql_id) SQL_ID,
-         sess.event,
-         SM.SQL_PLAN_HASH_VALUE PHV,
-         SESS.program,
-         sess.action,
-         sess.module,
-         sess.client_identifier,
-         SESS.username,
-         SESS.osuser,
-         --SESS.STATUS,
-         ROUND (SM.APPLICATION_WAIT_TIME / 1e6, 2) "APP_WT(s)",
-         ROUND (SM.CLUSTER_WAIT_TIME / 1e6, 2) "CLUSTER_WT(s)",
-         ROUND (SM.CONCURRENCY_WAIT_TIME / 1e6, 2) "CONCURRENCY_WT(s)",
-         ROUND (SM.USER_IO_WAIT_TIME / 1e6, 2) "USERIO_WT(s)",
-         ROUND (SM.CPU_TIME / 1e6, 2) "CPU_TIME(s)",
-         ROUND (SM.BUFFER_GETS) "LIO",
-         SM.PX_SERVERS_ALLOCATED "PX_THREADS",
-         SESS.SQL_CHILD_NUMBER,
-         SM.KEY,
-         /*   'exec sys.tsdappdba.kill_session_rac('''
-         || sess.sid
-         || ''','''
-         || sess.serial#
-         || ''','''
-         || sess.inst_id
-         || ''');  ' */
+			<sql><![CDATA[SELECT sess.*,
          'ALTER SYSTEM KILL SESSION '''||sess.sid
          || ','
          || sess.serial#
          || ',@'
          || sess.inst_id||''' IMMEDIATE;'
             Kill_command
-    FROM GV$SESSION SESS, GV$SQL_MONITOR SM
-   WHERE     1 = 1
-         AND SESS.username IS NOT NULL
-         AND SESS.INST_ID = SM.INST_ID(+)
-         AND SESS.SID = SM.SID(+)
-         AND SESS.SERIAL# = SM.SESSION_SERIAL#(+)
-         AND SESS.SQL_EXEC_ID = SM.SQL_EXEC_ID(+)
-         AND SESS.SQL_EXEC_START = SM.SQL_EXEC_START (+)
-         --AND (sess.status = 'ACTIVE' or sm.status='EXECUTING')
-ORDER BY LAST_CALL_ET DESC;]]></sql>
+    FROM GV$SESSION SESS
+--ORDER BY LAST_CALL_ET DESC;]]></sql>
 		</query>
 		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Monitor Plan]]></name>
@@ -2353,7 +2315,7 @@ from c1, gv$instance i
 where c1.INST_ID=i.INST_ID
 order by 1]]></sql>
 			</query>
-			<display id="" type="" style="Chart" enable="true">
+			<display id="null" type="" style="Chart" enable="true">
 				<name><![CDATA[OS Users]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2371,7 +2333,7 @@ order by 1]]></sql>
 					<PLOT_VGRID_COLOR.COLOR><![CDATA[-3355444]]></PLOT_VGRID_COLOR.COLOR>
 					<PLOT_DATALABELS_SLICE_POSITION><![CDATA[OUTSIDE_SLICE_LINE_IF]]></PLOT_DATALABELS_SLICE_POSITION>
 					<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
-					<DATA_MAP_COLUMNS><![CDATA[\,"STATUS"]]></DATA_MAP_COLUMNS>
+					<DATA_MAP_COLUMNS><![CDATA[\,"INSTANCE_STATUS"]]></DATA_MAP_COLUMNS>
 					<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
 					<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
 					<PLOT_HGRID_COLOR.COLOR><![CDATA[-3355444]]></PLOT_HGRID_COLOR.COLOR>
@@ -2387,6 +2349,7 @@ order by 1]]></sql>
 					<DATA_MAP_SERIES><![CDATA[\,"OSUSER"]]></DATA_MAP_SERIES>
 					<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
 					<GRID><![CDATA[true]]></GRID>
+					<DATA_MAP_COUNT><![CDATA[1]]></DATA_MAP_COUNT>
 					<STYLE><![CDATA[Autumn]]></STYLE>
 					<TITLE_ALIGNMENT><![CDATA[CENTER]]></TITLE_ALIGNMENT>
 					<XAXIS_SCALE_INCREMENT><![CDATA[20.0]]></XAXIS_SCALE_INCREMENT>
@@ -2407,10 +2370,11 @@ order by 1]]></sql>
 					<SUBTITLE_ALIGNMENT><![CDATA[CENTER]]></SUBTITLE_ALIGNMENT>
 				</CustomValues>
 				<query>
-					<sql><![CDATA[select status, status ,osuser, count(*)
+					<sql><![CDATA[select inst_id||'-'||status as instance_status ,nvl(osuser,'background') as osuser, count(*)
 from gv$session
-where inst_id=:INST_ID
-group by status, status, osuser]]></sql>
+where inst_id=:INST_ID or :INST_ID is null
+group by inst_id||'-'||status, nvl(osuser,'background')
+order by inst_id||'-'||status, nvl(osuser,'background')]]></sql>
 					<binds>
 						<bind id="INST_ID">
 							<prompt><![CDATA[INST_ID]]></prompt>
@@ -2421,7 +2385,7 @@ group by status, status, osuser]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Chart" enable="true">
+			<display id="null" type="" style="Chart" enable="true">
 				<name><![CDATA[Oracle Users]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2435,9 +2399,10 @@ group by status, status, osuser]]></sql>
 					<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
 					<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
 					<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
-					<DATA_MAP_COLUMNS><![CDATA[\,"STATUS"]]></DATA_MAP_COLUMNS>
+					<DATA_MAP_COLUMNS><![CDATA[\,"INSTANCE_STATUS"]]></DATA_MAP_COLUMNS>
 					<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
 					<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+					<PLOT_DATALABELS><![CDATA[true]]></PLOT_DATALABELS>
 					<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
 					<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
 					<TYPE><![CDATA[BAR_VERT_CLUST]]></TYPE>
@@ -2448,23 +2413,27 @@ group by status, status, osuser]]></sql>
 					<DATA_MAP_COLNAMES><![CDATA[\,"COUNT(*)","STATUS","USERNAME"]]></DATA_MAP_COLNAMES>
 					<DATA_MAP_SERIES><![CDATA[\,"USERNAME"]]></DATA_MAP_SERIES>
 					<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+					<GRID><![CDATA[true]]></GRID>
 					<STYLE><![CDATA[Autumn]]></STYLE>
 					<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+					<TITLE_TEXT><![CDATA[Session Status by USERNAME]]></TITLE_TEXT>
 					<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
 					<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
 					<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
 					<DATA_MAP_VALUES><![CDATA[\,"COUNT(*)"]]></DATA_MAP_VALUES>
 					<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+					<TITLE><![CDATA[true]]></TITLE>
 					<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
 					<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
 					<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
 					<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
 				</CustomValues>
 				<query>
-					<sql><![CDATA[select status, status ,username, count(*)
+					<sql><![CDATA[select inst_id||'-'||status as instance_status ,nvl(username, 'background') as username, count(*)
 from gv$session
-where inst_id=:INST_ID
-group by status, status, username]]></sql>
+where inst_id=:INST_ID or :INST_ID is null
+group by inst_id||'-'||status, nvl(username, 'background')
+order by inst_id||'-'||status, nvl(username, 'background')]]></sql>
 					<binds>
 						<bind id="INST_ID">
 							<prompt><![CDATA[INST_ID]]></prompt>
@@ -2475,7 +2444,7 @@ group by status, status, username]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Recovery Tx]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2489,7 +2458,7 @@ decode(cputime,0,'unknown',sysdate+(((undoblockstotal-undoblocksdone) / (undoblo
 from gv$fast_start_transactions]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Blocking Sessions]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2540,7 +2509,7 @@ ORDER BY
   DECODE(c.block,0,'W','B')]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Script" enable="true">
+			<display id="null" type="" style="Script" enable="true">
 				<name><![CDATA[Lock Details]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2632,7 +2601,7 @@ where block =1;
 set feedback on]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Longops]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2648,7 +2617,7 @@ from gv$session_longops
 where time_remaining>0]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Top Events Last Min]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2682,7 +2651,7 @@ from (
   order by  inst_id, RR2]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Script" enable="true">
+			<display id="null" type="" style="Script" enable="true">
 				<name><![CDATA[ASH last hour Wait]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2776,7 +2745,7 @@ SELECT 'Others',
    AND ROUND(100 * others / samples, 1) > 0.1;]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Script" enable="true">
+			<display id="null" type="" style="Script" enable="true">
 				<name><![CDATA[Undo Usage]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
