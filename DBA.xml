@@ -15,8 +15,7 @@
 		<query>
 			<sql><![CDATA[select --INST_ID, GROUP_NUMBER, NAME, SECTOR_SIZE, LOGICAL_SECTOR_SIZE, BLOCK_SIZE, ALLOCATION_UNIT_SIZE, STATE, TYPE, TOTAL_MB, FREE_MB, HOT_USED_MB, COLD_USED_MB, REQUIRED_MIRROR_FREE_MB, USABLE_FILE_MB, OFFLINE_DISKS, COMPATIBILITY, DATABASE_COMPATIBILITY, VOTING_FILES, CON_ID
 *
-from gv$asm_diskgroup
-order by inst_id, group_number]]></sql>
+from gv$asm_diskgroup]]></sql>
 		</query>
 		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Disks]]></name>
@@ -67,6 +66,14 @@ order by bytes desc, a.name, a.inst_id]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_DISK_STAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -81,6 +88,14 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_DISK_IOSTAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -95,6 +110,14 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_CLIENT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -109,6 +132,14 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_DISKGROUP_STAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -123,6 +154,14 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_TEMPLATE
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 	</display>
@@ -325,34 +364,6 @@ order by LOG_DATE]]></sql>
 						<bracket><![CDATA[null]]></bracket>
 					</bind>
 				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[AutoTasks]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select a.* ,
-'exec DBMS_AUTO_TASK_ADMIN.ENABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as enable,
-'exec DBMS_AUTO_TASK_ADMIN.DISABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as disable
-from DBA_AUTOTASK_CLIENT a]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[AutoStatsExecutions]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from DBA_AUTO_STAT_EXECUTIONS]]></sql>
 			</query>
 		</display>
 	</display>
@@ -590,7 +601,6 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">21</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">22</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">23</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">24h</TD>');
   DBMS_OUTPUT.PUT_LINE('<TR>');
 
   FOR cur IN (
@@ -619,8 +629,7 @@ BEGIN
     sum(DECODE(to_char(first_time, 'HH24'), '20', 1, 0)) AS "20",
     sum(DECODE(to_char(first_time, 'HH24'), '21', 1, 0)) AS "21",
     sum(DECODE(to_char(first_time, 'HH24'), '22', 1, 0)) AS "22",
-    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23",
-    count(*) AS "24h"
+    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23"
     FROM v$log_history
     WHERE trunc(FIRST_TIME) >= trunc(sysdate - myHist)
     GROUP BY trunc(first_time)
@@ -628,8 +637,7 @@ BEGIN
   )
   LOOP
     DBMS_OUTPUT.PUT_LINE('<TR>');
-    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||
-                          TO_CHAR(cur.Day,'YYYY-MM-DD:D')||'<EM></TD>');
+    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||TO_CHAR(cur.Day,'DD-MON-YYYY')||'<EM></TD>');
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."00", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."01", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."02", myMax) );
@@ -654,7 +662,6 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."21", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."22", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."23", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."24h", myMax) );
     DBMS_OUTPUT.PUT_LINE('</TR>');
   END LOOP;
 
@@ -1298,7 +1305,6 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">21</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">22</TD>');
   DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">23</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">24h</TD>');
   DBMS_OUTPUT.PUT_LINE('<TR>');
 
   FOR cur IN (
@@ -1327,8 +1333,7 @@ BEGIN
     sum(DECODE(to_char(first_time, 'HH24'), '20', 1, 0)) AS "20",
     sum(DECODE(to_char(first_time, 'HH24'), '21', 1, 0)) AS "21",
     sum(DECODE(to_char(first_time, 'HH24'), '22', 1, 0)) AS "22",
-    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23",
-    count(*) AS "24h"
+    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23"
     FROM v$log_history
     WHERE trunc(FIRST_TIME) >= trunc(sysdate - myHist)
     GROUP BY trunc(first_time)
@@ -1336,8 +1341,7 @@ BEGIN
   )
   LOOP
     DBMS_OUTPUT.PUT_LINE('<TR>');
-    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||
-                          TO_CHAR(cur.Day,'YYYY-MM-DD:D')||'<EM></TD>');
+    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||TO_CHAR(cur.Day,'YYYY-MM-DD')||'<EM></TD>');
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."00", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."01", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."02", myMax) );
@@ -1362,7 +1366,6 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."21", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."22", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."23", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."24h", myMax) );
     DBMS_OUTPUT.PUT_LINE('</TR>');
   END LOOP;
 
@@ -1440,9 +1443,9 @@ from GV$DIAG_TRACE_FILE]]></sql>
 		<query>
 			<sql><![CDATA[select --s.sql_id, 
        s.* from gv$sql s
---order by sql_id]]></sql>
+order by sql_id, last_load_time]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[CursorPlan_all]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1472,7 +1475,7 @@ where :SQL_ID is not null]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[CursorPlan_adaptive]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1488,7 +1491,7 @@ where :SQL_ID is not null]]></sql>
 where :SQL_ID is not null]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLBindCapture]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1504,7 +1507,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 order by s.POSITION]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLCsHistogram]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1519,7 +1522,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 order by bucket_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLOptimizerEnv]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1534,7 +1537,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 order by id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLPLanStatistics]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1549,7 +1552,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 --order by id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLPLanStatisticsAll]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1564,7 +1567,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 order by id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLRedirection]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1578,7 +1581,7 @@ from GV$SQL_REDIRECTION s join all_users u on s.PARSING_USER_ID=u.USER_ID
 where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLReoptimizatioHints]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1593,7 +1596,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 order by hint_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLSharedCursor]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1608,7 +1611,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 --order by id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLWorkarea]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1623,7 +1626,7 @@ where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
 order by operation_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLWorkareaActive]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1638,7 +1641,7 @@ where (s.sql_id=:SQL_ID ) or (:SQL_ID is null )
 order by operation_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLWorkareaHistogram]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1652,7 +1655,7 @@ from GV$SQL_WORKAREA_HISTOGRAM
 order by 1,2]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLArea]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1665,9 +1668,17 @@ order by 1,2]]></sql>
 from GV$SQLAREA s 
 where s.sql_id=:SQL_ID or :SQL_ID is null
 --order by operation_id]]></sql>
+				<binds>
+					<bind id="SQL_ID">
+						<prompt><![CDATA[SQL_ID]]></prompt>
+						<tooltip><![CDATA[SQL_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLAreaPlanHash]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1682,7 +1693,7 @@ where s.sql_id=:SQL_ID  or :SQL_ID is null
 --order by operation_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLStats]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1696,7 +1707,7 @@ from GV$SQLSTATS s
 where s.sql_id=:SQL_ID  or :SQL_ID is null]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLStatsPlanHash]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1710,7 +1721,7 @@ from GV$SQLSTATS_PLAN_HASH s
 where s.sql_id=:SQL_ID  or :SQL_ID is null]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLText]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1722,10 +1733,10 @@ where s.sql_id=:SQL_ID  or :SQL_ID is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$SQLTEXT s 
 where s.sql_id=:SQL_ID  or :SQL_ID is null
-order by inst_id, piece]]></sql>
+order by piece]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SQLTextWithNewlines]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1752,7 +1763,7 @@ order by piece]]></sql>
 		<query>
 			<sql><![CDATA[select * 
 from GV$DIAG_INFO
-order by INST_ID,NAME]]></sql>
+--order by INST_ID,NAME]]></sql>
 		</query>
 		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DiagAlertExt]]></name>
@@ -2839,7 +2850,10 @@ where status > 1)
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
 		<query>
-			<sql><![CDATA[select u.*, 'alter user '||u.username||' PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account 
+			<sql><![CDATA[select u.*, 
+  'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
+  'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
+  'alter user "'||u.username||'" identified by "";' as change_password
 from dba_users u
 order by username]]></sql>
 		</query>
