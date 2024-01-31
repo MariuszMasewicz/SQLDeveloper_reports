@@ -2850,11 +2850,12 @@ where status > 1)
 			<sql><![CDATA[select u.*, 
   'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
   'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
-  'alter user "'||u.username||'" identified by "";' as change_password
+  'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
+  'alter session set current_schema = "'||u.username||'";' as change_schema
 from dba_users u
 order by username]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[UserProfile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -2877,7 +2878,7 @@ order by profile, resource_type, limit]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[ObjectPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -2890,17 +2891,9 @@ order by profile, resource_type, limit]]></sql>
 from DBA_TAB_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, owner, table_name, privilege]]></sql>
-				<binds>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SystemPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -2915,7 +2908,7 @@ where grantee=:USERNAME or :USERNAME is null
 order by grantee, privilege]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Roles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -2928,17 +2921,9 @@ order by grantee, privilege]]></sql>
 from DBA_ROLE_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, granted_role]]></sql>
-				<binds>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="plsql-dbms_output" enable="true">
+		<display id="null" type="" style="plsql-dbms_output" enable="true">
 			<name><![CDATA[All Privileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3081,14 +3066,6 @@ dbms_output.put_line('ERROR (main) => '||sqlcode);
 dbms_output.put_line('MSG (main) => '||sqlerrm);
 
 end;]]></sql>
-				<binds>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
 	</display>
