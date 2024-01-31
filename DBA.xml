@@ -1197,14 +1197,6 @@ ORDER BY group#, thread#]]></sql>
   FROM v$logfile
 where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) IS NULL)
 ORDER BY group#, MEMBER]]></sql>
-				<binds>
-					<bind id="TABLESPACE_LOGGROUP">
-						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
-						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
 		<display id="null" type="" style="plsql-dbms_output" enable="true">
@@ -1426,6 +1418,25 @@ ORDER by name]]></sql>
 			<query>
 				<sql><![CDATA[select * 
 from GV$DIAG_TRACE_FILE]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Tablespaces]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select t.* , 
+  'DROP TABLESPACE "'||t.name||'" INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS;' as drop_tablespace,
+  'ALTER TABLESPACE "'||t.name||'" READ ONLY;' as read_only,
+  'ALTER TABLESPACE "'||t.name||'" READ WRITE;' as read_write,
+  'ALTER TABLESPACE "'||t.name||'" OFFLINE IMMEDIATE;' as go_offline,
+  'ALTER TABLESPACE "'||t.name||'" ONLINE;' as go_online,
+  'ALTER TABLESPACE "'||t.name||'" ADD DATAFILE ''/path/name'' SIZE 100K AUTOEXTEND ON NEXT 100K MAXSIZE UNLIMITED' as add_datafile
+from gv$tablespace t]]></sql>
 			</query>
 		</display>
 	</display>
@@ -2851,7 +2862,8 @@ where status > 1)
   'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
   'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
   'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
-  'alter session set current_schema = "'||u.username||'";' as change_schema
+  'alter session set current_schema = "'||u.username||'";' as change_schema,
+  'DROP USER "'||u.username||'" CASCADE;' as drop_user
 from dba_users u
 order by username]]></sql>
 		</query>
