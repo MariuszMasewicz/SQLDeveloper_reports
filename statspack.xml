@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<displays>
+<display id="fba32215-018d-1000-8001-ac10010c1abc" type="" style="Chart" enable="true">
+	<name><![CDATA[System Statistics from Statspac]]></name>
+	<description><![CDATA[]]></description>
+	<tooltip><![CDATA[]]></tooltip>
+	<drillclass><![CDATA[]]></drillclass>
+	<CustomValues>
+		<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+		<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+		<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+		<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+		<Y1AXIS_LOGARITHMIC_SCALE><![CDATA[true]]></Y1AXIS_LOGARITHMIC_SCALE>
+		<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+		<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+		<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+		<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+		<DATA_MAP_COLUMNS><![CDATA[\,"TIME"]]></DATA_MAP_COLUMNS>
+		<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
+		<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+		<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+		<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+		<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+		<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+		<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
+		<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+		<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+		<DATA_MAP_COLNAMES><![CDATA[\,"PER_SEC","STAT_NAME","TIME"]]></DATA_MAP_COLNAMES>
+		<DATA_MAP_SERIES><![CDATA[\,"STAT_NAME"]]></DATA_MAP_SERIES>
+		<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+		<DATA_MAP_COUNT><![CDATA[1]]></DATA_MAP_COUNT>
+		<STYLE><![CDATA[Default]]></STYLE>
+		<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+		<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+		<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+		<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+		<DATA_MAP_VALUES><![CDATA[\,"PER_SEC"]]></DATA_MAP_VALUES>
+		<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+		<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+		<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+		<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+		<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+	</CustomValues>
+	<query>
+		<sql><![CDATA[-- Get System Statistics from Statspack
+WITH snaps AS(
+     SELECT sn.snap_id
+          , sn.snap_time
+          , ROUND((sn.snap_time - LAG( sn.snap_time, 1 ) OVER( PARTITION BY sn.instance_number ORDER BY sn.snap_id )) *24*3600, 2 ) AS time_diff
+          , sn.instance_number
+          , sn.dbid
+       FROM stats$snapshot sn
+      WHERE sn.instance_number = ( SELECT instance_number FROM v$instance )
+)
+SELECT TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) time
+     , stat_name
+     , ROUND( value_diff / time_diff, 2 )AS per_sec
+--     , snap_id
+  FROM
+     (
+     SELECT sn.snap_id
+          , ss.value
+          , ( ss.value - LAG( ss.value, 1 ) OVER( PARTITION BY ss.name ORDER BY ss.snap_id )) AS value_diff
+          , sn.time_diff
+          , sn.snap_time
+          , ss.name stat_name
+       FROM stats$sysstat ss
+          , snaps sn
+      WHERE ss.name IN( 'user commits', 'user rollbacks', 'user calls', 'recursive calls', 'user logons cumulative', 'execute count', 'parse count (total)'
+      )
+        AND sn.snap_id = ss.snap_id
+        and sn.snap_time between sysdate - :days_start and sysdate - :days_end
+        AND ss.dbid = sn.dbid
+        AND ss.instance_number = sn.instance_number
+     )
+ORDER BY snap_time, stat_name]]></sql>
+		<binds>
+			<bind id="days_start">
+				<prompt><![CDATA[days_start]]></prompt>
+				<tooltip><![CDATA[days_start]]></tooltip>
+				<value><![CDATA[1]]></value>
+				<bracket><![CDATA[null]]></bracket>
+			</bind>
+			<bind id="days_end">
+				<prompt><![CDATA[days_end]]></prompt>
+				<tooltip><![CDATA[days_end]]></tooltip>
+				<value><![CDATA[0]]></value>
+				<bracket><![CDATA[null]]></bracket>
+			</bind>
+		</binds>
+	</query>
+	<display id="null" type="" style="Chart" enable="true">
+		<name><![CDATA[IO]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+			<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+			<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+			<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+			<Y1AXIS_LOGARITHMIC_SCALE><![CDATA[true]]></Y1AXIS_LOGARITHMIC_SCALE>
+			<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+			<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+			<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+			<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+			<DATA_MAP_COLUMNS><![CDATA[\,"TIME"]]></DATA_MAP_COLUMNS>
+			<Y1AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y1AXIS_SCALE_MAXIMUM>
+			<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+			<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+			<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+			<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+			<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+			<DATA_MAP_COLNAMES><![CDATA[\,"PER_SEC","STAT_NAME","TIME"]]></DATA_MAP_COLNAMES>
+			<DATA_MAP_SERIES><![CDATA[\,"STAT_NAME"]]></DATA_MAP_SERIES>
+			<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+			<STYLE><![CDATA[Default]]></STYLE>
+			<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+			<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+			<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+			<DATA_MAP_VALUES><![CDATA[\,"PER_SEC"]]></DATA_MAP_VALUES>
+			<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+			<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+			<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+			<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[-- Get System Statistics from Statspack
+WITH snaps AS(
+     SELECT sn.snap_id
+          , sn.snap_time
+          , ROUND((sn.snap_time - LAG( sn.snap_time, 1 ) OVER( PARTITION BY sn.instance_number ORDER BY sn.snap_id )) *24*3600, 2 ) AS time_diff
+          , sn.instance_number
+          , sn.dbid
+       FROM stats$snapshot sn
+      WHERE sn.instance_number = ( SELECT instance_number FROM v$instance )
+)
+SELECT TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) time
+     , stat_name
+     , ROUND( value_diff / time_diff, 2 )AS per_sec
+  FROM
+     (
+     SELECT sn.snap_id
+          , ss.value
+          , ( ss.value - LAG( ss.value, 1 ) OVER( PARTITION BY ss.name ORDER BY ss.snap_id )) AS value_diff
+          , sn.time_diff
+          , sn.snap_time
+          , ss.name stat_name
+       FROM stats$sysstat ss
+          , snaps sn
+      WHERE ss.name IN( 'physical reads', 'physical reads cache', 'physical writes', 'physical read IO requests', 'physical write IO requests' )
+        AND sn.snap_id = ss.snap_id
+        and sn.snap_time between sysdate - :days_start and sysdate - :days_end
+        AND ss.dbid = sn.dbid
+        AND ss.instance_number = sn.instance_number
+     )
+ORDER BY snap_time, stat_name]]></sql>
+			<binds>
+				<bind id="days_start">
+					<prompt><![CDATA[days_start]]></prompt>
+					<tooltip><![CDATA[days_start]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+				<bind id="days_end">
+					<prompt><![CDATA[days_end]]></prompt>
+					<tooltip><![CDATA[days_end]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Chart" enable="true">
+		<name><![CDATA[Gets]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+			<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+			<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+			<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+			<Y1AXIS_LOGARITHMIC_SCALE><![CDATA[true]]></Y1AXIS_LOGARITHMIC_SCALE>
+			<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+			<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+			<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+			<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+			<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
+			<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+			<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+			<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+			<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+			<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
+			<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+			<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+			<STYLE><![CDATA[Default]]></STYLE>
+			<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+			<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+			<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+			<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+			<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+			<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+			<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[WITH snaps AS(
+     SELECT sn.snap_id
+          , sn.snap_time
+          , LAG( sn.snap_id, 1 ) OVER( ORDER BY sn.snap_id ) AS prev_snap_id
+          , ( LAG( sn.snap_time, 1 ) OVER( ORDER BY sn.snap_id ) - sn.snap_time ) *24*3600 AS time_diff
+          , sn.instance_number
+          , sn.dbid
+       FROM stats$snapshot sn
+)
+SELECT TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) time
+     , stat_name
+     , value_diff  * blksz / 1024 / 1024
+       / DECODE( time_diff, 0, NULL, time_diff ) "MB/s"
+  FROM
+     (
+     SELECT sn.snap_id
+          , ( LAG( ss.value, 3 ) OVER( ORDER BY ss.snap_id, ss.name ) - ss.value ) AS value_diff
+          , sn.time_diff
+          , sn.snap_time
+          , ss.name stat_name
+          , ( select to_number(value) from v$parameter where name='db_block_size' ) blksz
+       FROM stats$sysstat ss
+          , snaps sn
+      WHERE ss.name IN ('db block changes', 'db block gets', 'consistent gets')
+        AND sn.snap_id = ss.snap_id
+        and sn.snap_time between sysdate - :days_start and sysdate - :days_end
+        AND ss.dbid = sn.dbid
+        AND ss.instance_number = sn.instance_number
+        AND sn.instance_number = ( SELECT instance_number FROM v$instance )
+     )
+ORDER BY snap_time, stat_name DESC]]></sql>
+			<binds>
+				<bind id="days_start">
+					<prompt><![CDATA[days_start]]></prompt>
+					<tooltip><![CDATA[days_start]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+				<bind id="days_end">
+					<prompt><![CDATA[days_end]]></prompt>
+					<tooltip><![CDATA[days_end]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Chart" enable="true">
+		<name><![CDATA[Active Sessions]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+			<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+			<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+			<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+			<Y1AXIS_LOGARITHMIC_SCALE><![CDATA[false]]></Y1AXIS_LOGARITHMIC_SCALE>
+			<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+			<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+			<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+			<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+			<Y1AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y1AXIS_SCALE_MAXIMUM>
+			<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+			<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+			<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+			<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+			<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+			<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+			<STYLE><![CDATA[Default]]></STYLE>
+			<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+			<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+			<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+			<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+			<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+			<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+			<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[-- Get Logical CPUs and OS CPU Load
+SELECT TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) time
+     , CASE nm.stat_name
+       WHEN 'NUM_CPUS' THEN 'Log. CPUs'
+       WHEN 'LOAD' THEN 'OS Load'
+       ELSE nm.stat_name
+       END AS stat_name
+     , os.value
+     , sn.snap_time
+  FROM stats$osstat os
+     , stats$osstatname nm
+     , stats$snapshot sn
+ WHERE os.osstat_id = nm.osstat_id
+   AND nm.stat_name IN( 'NUM_CPUS', 'LOAD' )
+   AND sn.snap_id = os.snap_id
+   and sn.snap_time between sysdate - :days_start and sysdate - :days_end
+   AND sn.instance_number = ( SELECT instance_number FROM v$instance )
+   AND os.instance_number = sn.instance_number
+UNION ALL
+-- Get AAS (= DB Time / Wall Clock Time)
+-- Wait times are measured in microseconds
+SELECT time
+     , 'AAS' AS stat_name
+     , value_diff / DECODE( time_diff, 0, NULL, time_diff ) / 24 / 3600 / 1000000 AS aas
+     , snap_time
+FROM
+(
+  SELECT TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' )  time
+       , ( LEAD( tm.value, 1 ) OVER( ORDER BY tm.snap_id ) - tm.value ) AS value_diff
+       , ( LEAD( sn.snap_time, 1 ) OVER( ORDER BY sn.snap_id ) - sn.snap_time ) AS time_diff
+       , sn.snap_time
+    FROM stats$sys_time_model tm
+       , stats$time_model_statname nm
+       , stats$snapshot sn
+   WHERE tm.stat_id = nm.stat_id
+     and sn.snap_time between sysdate - :days_start and sysdate - :days_end
+     AND nm.stat_name = 'DB time'
+     AND sn.snap_id = tm.snap_id
+     AND sn.instance_number = ( SELECT instance_number FROM v$instance )
+     AND tm.instance_number = sn.instance_number
+)
+ ORDER BY snap_time, stat_name]]></sql>
+			<binds>
+				<bind id="days_start">
+					<prompt><![CDATA[days_start]]></prompt>
+					<tooltip><![CDATA[days_start]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+				<bind id="days_end">
+					<prompt><![CDATA[days_end]]></prompt>
+					<tooltip><![CDATA[days_end]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[Time Model]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[SELECT snap_time ||' - '|| SUBSTR( nextt, -5 ) AS interval
+     , stat_name
+     , ROUND( dv / DECODE( dt, 0, NULL, dt ) / 24 / 3600 / 1000000, 2 ) aas
+FROM (
+SELECT tm.snap_id, sn.snap_time, nm.stat_name
+     , tm.VALUE
+     , LEAD( tm.value, 1 ) OVER( PARTITION BY tm.stat_id ORDER BY tm.snap_id ) nextv
+     , LEAD( tm.value, 1 ) OVER( PARTITION BY tm.stat_id ORDER BY tm.snap_id )- tm.value dv
+     , LEAD( sn.snap_time, 1 ) OVER( PARTITION BY tm.stat_id ORDER BY tm.snap_id ) nextt
+     , LEAD( sn.snap_time, 1 ) OVER( PARTITION BY tm.stat_id ORDER BY tm.snap_id ) - sn.snap_time AS dt
+  FROM STATS$TIME_MODEL_STATNAME nm
+     , STATS$SYS_TIME_MODEL tm
+     , STATS$SNAPSHOT sn
+ WHERE tm.STAT_ID = nm.STAT_ID
+   AND tm.SNAP_ID = sn.SNAP_ID
+   AND sn.instance_number = ( SELECT instance_number FROM v$instance )
+   AND TO_CHAR( sn.snap_time, 'YYYY-MM-DD hh24:mi' ) >= :TIME
+)
+ WHERE TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME
+   AND ROUND( dv / DECODE( dt, 0, NULL, dt ) / 24 / 3600 / 1000000, 2 ) > 0
+ ORDER BY aas DESC, stat_name]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[Top Events]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[SELECT * FROM(
+  SELECT TO_CHAR(snap_time, 'YYYY-MM-DD hh24:mi')
+         ||' - '|| TO_CHAR( LEAD( snap_time, 1 ) OVER( PARTITION BY event ORDER BY snap_id ), 'hh24:mi' ) AS interval
+       , event
+       , ROUND(( LEAD( time_spent, 1 ) OVER( PARTITION BY event ORDER BY snap_id ) - time_spent ) /
+         ( LEAD( snap_time, 1 ) OVER( PARTITION BY event ORDER BY snap_id ) - snap_time ) / 24 ) seconds_waited
+    FROM(
+    SELECT    snap_id,
+              snap_time,
+              event,
+              time_waited_micro / 1000000 AS time_spent
+       FROM   stats$snapshot NATURAL JOIN stats$system_event NATURAL JOIN v$event_name
+      WHERE   TRUNC( snap_time, 'mi' ) BETWEEN TO_DATE( :TIME, 'YYYY-MM-DD hh24:mi' )
+              AND ( SELECT MIN( snap_time ) FROM stats$snapshot WHERE TRUNC( snap_time, 'mi' ) > TO_DATE( :TIME, 'YYYY-MM-DD hh24:mi' ) )
+        AND   wait_class# != 6
+        AND   instance_number = ( SELECT instance_number FROM v$instance )
+    
+              UNION ALL
+    
+     SELECT   snap_id,
+              snap_time,
+              'CPU used by this session' AS event,
+              value / 100 as time_spent
+       FROM   stats$sysstat NATURAL JOIN stats$snapshot
+      WHERE   TRUNC( snap_time, 'mi' ) BETWEEN TO_DATE( :TIME, 'YYYY-MM-DD hh24:mi' )
+              AND ( SELECT MIN( snap_time ) FROM stats$snapshot WHERE TRUNC( snap_time, 'mi' ) > TO_DATE( :TIME, 'YYYY-MM-DD hh24:mi' ) )
+        AND   name = 'CPU used by this session'
+        AND   instance_number = ( SELECT instance_number FROM v$instance )
+  )
+  ORDER BY seconds_waited DESC NULLS LAST
+)
+--WHERE ROWNUM < 6]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[STATS$SHARED_POOL_ADVICE]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select spa.* 
+from stats$snapshot sn join STATS$SHARED_POOL_ADVICE spa on (sn.snap_id=spa.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[STATS$WAITSTAT]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select stat.* 
+from stats$snapshot sn join STATS$WAITSTAT stat on (sn.snap_id=stat.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME
+order by stat.time desc]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Chart" enable="true">
+		<name><![CDATA[STATS$SGA]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+			<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+			<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+			<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+			<Y1AXIS_LOGARITHMIC_SCALE><![CDATA[true]]></Y1AXIS_LOGARITHMIC_SCALE>
+			<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+			<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+			<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+			<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+			<DATA_MAP_COLUMNS><![CDATA[\,,]]></DATA_MAP_COLUMNS>
+			<Y1AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y1AXIS_SCALE_MAXIMUM>
+			<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+			<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+			<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+			<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+			<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+			<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+			<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+			<DATA_MAP_COUNT><![CDATA[2]]></DATA_MAP_COUNT>
+			<STYLE><![CDATA[Default]]></STYLE>
+			<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+			<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+			<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+			<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+			<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+			<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+			<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+			<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[SELECT TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) time 
+     , name
+     , value
+  FROM
+   stats$snapshot sn join STATS$SGA stat on (sn.snap_id=stat.snap_id)
+where sn.snap_time between sysdate - :days_start and sysdate - :days_end
+ORDER BY time, name DESC]]></sql>
+			<binds>
+				<bind id="days_start">
+					<prompt><![CDATA[days_start]]></prompt>
+					<tooltip><![CDATA[days_start]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+				<bind id="days_end">
+					<prompt><![CDATA[days_end]]></prompt>
+					<tooltip><![CDATA[days_end]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[STATS$DB_CACHE_ADVICE]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select :TIME, stat.* 
+from stats$snapshot sn join STATS$DB_CACHE_ADVICE stat on (sn.snap_id=stat.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[STATS$FILESTATXS]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select :TIME, stat.* 
+from stats$snapshot sn join STATS$FILESTATXS stat on (sn.snap_id=stat.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[STATS$PARAMETER]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select :TIME, stat.* 
+from stats$snapshot sn join STATS$PARAMETER stat on (sn.snap_id=stat.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME
+order by name]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[STATS$PGA_TARGET_ADVICE]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select :TIME, stat.* 
+from stats$snapshot sn join STATS$PGA_TARGET_ADVICE stat on (sn.snap_id=stat.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+	<display id="null" type="" style="Table" enable="true">
+		<name><![CDATA[STATS$SQL_WORKAREA_HISTOGRAM]]></name>
+		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[]]></tooltip>
+		<drillclass><![CDATA[]]></drillclass>
+		<CustomValues>
+			<TYPE><![CDATA[horizontal]]></TYPE>
+		</CustomValues>
+		<query>
+			<sql><![CDATA[select :TIME, stat.* 
+from stats$snapshot sn join STATS$SQL_WORKAREA_HISTOGRAM stat on (sn.snap_id=stat.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+			<binds>
+				<bind id="TIME">
+					<prompt><![CDATA[TIME]]></prompt>
+					<tooltip><![CDATA[TIME]]></tooltip>
+					<value><![CDATA[NULL_VALUE]]></value>
+					<bracket><![CDATA[null]]></bracket>
+				</bind>
+			</binds>
+		</query>
+	</display>
+</display>
+</displays>
