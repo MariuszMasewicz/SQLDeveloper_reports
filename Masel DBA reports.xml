@@ -139,7 +139,7 @@ from gv$asm_operation a
 		<CustomValues>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
-		<query minversion="12">
+		<query>
 			<sql><![CDATA[select 
 'SQLDEV:LINK:'
        || owner
@@ -157,7 +157,7 @@ j.*,
 from cdb_scheduler_jobs j
 order by owner, job_name]]></sql>
 		</query>
-		<query maxversion="11">
+		<query>
 			<sql><![CDATA[select 
 'SQLDEV:LINK:'
        || owner
@@ -175,7 +175,7 @@ j.*,
 from dba_scheduler_jobs j
 order by owner, job_name]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Running jobs]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -190,7 +190,7 @@ from DBA_SCHEDULER_RUNNING_JOBS
 order by owner, job_name]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Job run details]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -219,7 +219,7 @@ order by LOG_ID desc --,LOG_DATE desc]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Job log]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -234,7 +234,7 @@ where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Global attribute]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -248,7 +248,7 @@ from DBA_SCHEDULER_GLOBAL_ATTRIBUTE
 order by ATTRIBUTE_NAME]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Instance parameters]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -263,7 +263,7 @@ order by ATTRIBUTE_NAME]]></sql>
 order by isdefault, name]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Chart" enable="true">
+		<display id="" type="" style="Chart" enable="true">
 			<name><![CDATA[Job duration and CPU]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -344,7 +344,7 @@ order by LOG_DATE]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[AutoTasks]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -359,7 +359,7 @@ order by LOG_DATE]]></sql>
 from DBA_AUTOTASK_CLIENT a]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[AutoStatsExecutions]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -404,17 +404,17 @@ order by inst_id, sid, serial#]]></sql>
 		<CustomValues>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
-		<query maxversion="11">
+		<query>
 			<sql><![CDATA[SELECT *
   FROM dba_autotask_client
 order by client_name]]></sql>
 		</query>
-		<query minversion="12">
+		<query>
 			<sql><![CDATA[SELECT *
 FROM cdb_autotask_client
 order by client_name, con_id]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[History]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -422,13 +422,13 @@ order by client_name, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select *
   FROM dba_autotask_job_history
  where client_name like :CLIENT_NAME
  ORDER BY job_start_time DESC]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select *
   FROM cdb_autotask_job_history
  where ((client_name = :CLIENT_NAME or :CLIENT_NAME is null) and (con_id=:CON_ID or :CON_ID is null))
@@ -449,7 +449,7 @@ order by client_name, con_id]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Job History]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -457,20 +457,20 @@ order by client_name, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM dba_autotask_job_history
  WHERE client_name = :CLIENT_NAME
  ORDER BY job_start_time DESC]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM cdb_autotask_job_history
  WHERE ((client_name = :CLIENT_NAME or :CLIENT_NAME is null) and (con_id=:CON_ID or :CON_ID is null))
  ORDER BY job_start_time DESC, con_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Window History]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -478,18 +478,18 @@ order by client_name, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM dba_autotask_window_history
  ORDER BY window_start_time DESC]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM cdb_autotask_window_history
  ORDER BY window_start_time DESC, con_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Program]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -497,11 +497,11 @@ order by client_name, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[vertical]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[SELECT * FROM DBA_SCHEDULER_PROGRAMS
  WHERE UPPER( program_name ) IN ( SELECT UPPER( TASK_NAME ) FROM dba_autotask_task WHERE client_name = :CLIENT_NAME )]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[SELECT * FROM cdb_SCHEDULER_PROGRAMS
  WHERE UPPER( program_name ) IN ( SELECT UPPER( TASK_NAME ) FROM cdb_autotask_task WHERE client_name = :CLIENT_NAME )]]></sql>
 				<binds>
@@ -514,7 +514,7 @@ order by client_name, con_id]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Tasks]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -522,12 +522,12 @@ order by client_name, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM dba_autotask_task
  WHERE client_name = :CLIENT_NAME]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM cdb_autotask_task
  WHERE client_name = :CLIENT_NAME]]></sql>
@@ -1078,7 +1078,7 @@ END;]]></sql>
 		<CustomValues>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
-		<query minversion="12">
+		<query>
 			<sql><![CDATA[SELECT typ, con_id, Tablespace_LogGroup, SUM(gb) GB, sum(files) as files FROM
 (
 SELECT 'Datafiles' typ, con_id, tablespace_name Tablespace_LogGroup,  ROUND(  bytes/1024/1024/1024, 2 ) GB, 1 as files
@@ -1096,7 +1096,7 @@ SELECT 'Controlfiles' typ, null, 'Controlfile' Tablespace_LogGroup, ROUND( BLOCK
 GROUP BY ROLLUP(typ, con_id, Tablespace_LogGroup)
 order by typ, con_id, Tablespace_LogGroup, GB desc]]></sql>
 		</query>
-		<query maxversion="11">
+		<query>
 			<sql><![CDATA[SELECT typ, Tablespace_LogGroup, SUM(gb) GB, sum(files) as files FROM
 (
 SELECT 'Datafiles' typ, tablespace_name Tablespace_LogGroup,  ROUND(  bytes/1024/1024/1024, 2 ) GB, 1 as files
@@ -1114,7 +1114,7 @@ SELECT 'Controlfiles' typ, 'Controlfile' Tablespace_LogGroup, ROUND( BLOCK_SIZE*
 GROUP BY ROLLUP(typ, Tablespace_LogGroup)
 order by typ, Tablespace_LogGroup, GB desc]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DataFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1122,7 +1122,7 @@ order by typ, Tablespace_LogGroup, GB desc]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[SELECT *
 FROM dba_data_files
 where TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL
@@ -1136,7 +1136,7 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
 					</bind>
 				</binds>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[SELECT *
 FROM cdb_data_files
 where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) and (CON_ID= :CON_ID OR :CON_ID IS NULL))
@@ -1157,7 +1157,7 @@ ORDER BY CON_ID, TABLESPACE_NAME, FILE_ID]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[TempFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1165,20 +1165,20 @@ ORDER BY CON_ID, TABLESPACE_NAME, FILE_ID]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM dba_temp_files
 where TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL
 ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[SELECT *
   FROM cdb_temp_files
 where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) and (CON_ID= :CON_ID OR :CON_ID IS NULL))
 ORDER BY con_id, TABLESPACE_NAME, FILE_ID]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[LogGroups]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1193,7 +1193,7 @@ where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUM
 ORDER BY group#, thread#]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[LogFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1208,7 +1208,7 @@ where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUM
 ORDER BY group#, MEMBER]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="plsql-dbms_output" enable="true">
+		<display id="" type="" style="plsql-dbms_output" enable="true">
 			<name><![CDATA[LogSwitchHeatMap]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1374,7 +1374,7 @@ BEGIN
 END;]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[LogSwitchHistory]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1388,7 +1388,7 @@ from gv$log_history
 order by sequence# desc]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[ArchivedLogs]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1402,7 +1402,7 @@ GV$ARCHIVED_LOG
 order by recid desc]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[ControlFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1416,7 +1416,7 @@ order by recid desc]]></sql>
 ORDER by name]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[DiagTraceFile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1429,7 +1429,7 @@ ORDER by name]]></sql>
 from GV$DIAG_TRACE_FILE]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Tablespaces]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1437,7 +1437,7 @@ from GV$DIAG_TRACE_FILE]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select t.* , 
   'DROP TABLESPACE "'||t.name||'" INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS;' as drop_tablespace,
   'ALTER TABLESPACE "'||t.name||'" READ ONLY;' as read_only,
@@ -1448,7 +1448,7 @@ from GV$DIAG_TRACE_FILE]]></sql>
 from gv$tablespace t
 order by name]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select t.* , 
   'DROP TABLESPACE "'||t.name||'" INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS;' as drop_tablespace,
   'ALTER TABLESPACE "'||t.name||'" READ ONLY;' as read_only,
@@ -1460,7 +1460,7 @@ from gv$tablespace t
 order by con_id, name]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[TablespacesSizing]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1468,7 +1468,7 @@ order by con_id, name]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[SELECT m.con_id, m.tablespace_name,
     'SQLDEV:GAUGE:0:100:0:0:'||round(max(m.used_percent))  as PERC_to_max_tbs_size_gauge,
     round(max(m.used_percent),1) PERC_to_max_tbs_size,
@@ -1491,7 +1491,7 @@ and tt.object_name is null
 GROUP BY m.con_id, m.tablespace_name
 order by 1,2]]></sql>
 			</query>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[SELECT m.tablespace_name,
     'SQLDEV:GAUGE:0:100:0:0:'||round(max(m.used_percent))  as PERC_to_max_tbs_size_gauge,
     round(max(m.used_percent),1) PERC_to_max_tbs_size,
@@ -3147,7 +3147,7 @@ order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
 		<CustomValues>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
-		<query maxversion="11">
+		<query>
 			<sql><![CDATA[select u.*, 
   'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
   'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
@@ -3157,7 +3157,7 @@ order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
 from dba_users u
 order by username]]></sql>
 		</query>
-		<query minversion="12">
+		<query>
 			<sql><![CDATA[select 
 'SQLDEV:LINK:'
        || username
@@ -3175,7 +3175,7 @@ u.*,
 from cdb_users u
 order by username, con_id]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[UserProfile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3183,13 +3183,13 @@ order by username, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select * 
 from dba_profiles
 where profile=:PROFILE or :PROFILE is null
 order by profile, resource_type, resource_name]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select * 
 from cdb_profiles
 where ((profile=:PROFILE or :PROFILE is null) and (CON_ID=:CON_ID or :CON_ID is null))
@@ -3210,7 +3210,7 @@ order by profile, resource_type, resource_name, CON_ID]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[ObjectPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3218,13 +3218,13 @@ order by profile, resource_type, resource_name, CON_ID]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select * 
 from DBA_TAB_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, owner, table_name, privilege]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select * 
 from cdb_TAB_PRIVS
 where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
@@ -3245,7 +3245,7 @@ order by grantee, owner, table_name, privilege, con_id]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[SystemPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3253,13 +3253,13 @@ order by grantee, owner, table_name, privilege, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select * 
 from DBA_SYS_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, privilege]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select * 
 from cdb_SYS_PRIVS
 where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
@@ -3280,7 +3280,7 @@ order by grantee, privilege, con_id]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Roles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3288,13 +3288,13 @@ order by grantee, privilege, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select * 
 from DBA_ROLE_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, granted_role]]></sql>
 			</query>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select * 
 from cdb_ROLE_PRIVS
 where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
@@ -3315,7 +3315,7 @@ order by grantee, granted_role, con_id]]></sql>
 				</binds>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[All Privileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3323,7 +3323,7 @@ order by grantee, granted_role, con_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select
   lpad(' ', 2*level) || granted_role "User, his roles and privileges"
 from
@@ -3370,7 +3370,7 @@ connect by grantee = prior granted_role]]></sql>
 					</bind>
 				</binds>
 			</query>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select
   lpad(' ', 2*level) || granted_role "User, his roles and privileges"
 from
@@ -3400,7 +3400,7 @@ start with grantee is null
 connect by grantee = prior granted_role]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[UserObjects]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3408,7 +3408,7 @@ connect by grantee = prior granted_role]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select 
 'SQLDEV:LINK:'
      ||owner
@@ -3436,7 +3436,7 @@ order by owner, object_name, object_id]]></sql>
 					</bind>
 				</binds>
 			</query>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select 
 'SQLDEV:LINK:'
      ||owner
@@ -3451,7 +3451,7 @@ where owner=:USERNAME
 order by owner, object_name, object_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[UserSegments]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3459,7 +3459,7 @@ order by owner, object_name, object_id]]></sql>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query minversion="12">
+			<query>
 				<sql><![CDATA[select 'SQLDEV:LINK:'
      ||owner
      ||':'
@@ -3486,7 +3486,7 @@ order by owner, SEGMENT_name--, object_id]]></sql>
 					</bind>
 				</binds>
 			</query>
-			<query maxversion="11">
+			<query>
 				<sql><![CDATA[select 'SQLDEV:LINK:'
      ||owner
      ||':'
@@ -4633,6 +4633,177 @@ order by machine, start_session, session_id, session_serial#]]></sql>
 				</binds>
 			</query>
 		</display>
+		<display id="afbfe959-0193-1000-8001-c0a8a168f6fb" type="" style="Chart" enable="true">
+			<name><![CDATA[queries vs parallel sessions]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+				<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+				<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+				<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+				<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+				<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+				<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+				<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+				<DATA_MAP_COLUMNS><![CDATA[\,"SAMPLE_TIME","SAMPLE_TIME","SAMPLE_TIME"]]></DATA_MAP_COLUMNS>
+				<Y1AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y1AXIS_SCALE_MAXIMUM>
+				<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+				<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+				<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+				<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+				<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+				<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+				<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+				<DATA_MAP_COLNAMES><![CDATA[\,"NUMBER_OF_QUERIES","NUMBER_OF_SESSIONS","PARALLEL_DEGREE","SAMPLE_TIME"]]></DATA_MAP_COLNAMES>
+				<DATA_MAP_SERIES><![CDATA[\,queries,sessions,parallel_degree]]></DATA_MAP_SERIES>
+				<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+				<DATA_MAP_COUNT><![CDATA[3]]></DATA_MAP_COUNT>
+				<STYLE><![CDATA[Default]]></STYLE>
+				<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+				<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+				<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+				<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+				<DATA_MAP_VALUES><![CDATA[\,"NUMBER_OF_QUERIES","NUMBER_OF_SESSIONS","PARALLEL_DEGREE"]]></DATA_MAP_VALUES>
+				<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+				<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+				<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+				<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+				<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select sample_time, count(distinct ah.sql_id) as number_of_queries, count(*) as number_of_sessions, count(*)/count(distinct ah.sql_id) as parallel_degree
+from DBA_HIST_ACTIVE_SESS_HISTORY ah  
+where 1=1
+and ah.sql_id like nvl(:sql_id , '%')
+and sample_time between to_timestamp(:start_timestamp, 'YYYY-MM-DD HH24:mi') and to_timestamp(:end_timestamp, 'YYYY-MM-DD HH24:mi')
+group by sample_time
+order by ah.sample_time]]></sql>
+				<binds>
+					<bind id="sql_id">
+						<prompt><![CDATA[sql_id]]></prompt>
+						<tooltip><![CDATA[sql_id]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="start_timestamp">
+						<prompt><![CDATA[start_timestamp]]></prompt>
+						<tooltip><![CDATA[start_timestamp]]></tooltip>
+						<value><![CDATA[2024-12-09 02:00]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="end_timestamp">
+						<prompt><![CDATA[end_timestamp]]></prompt>
+						<tooltip><![CDATA[end_timestamp]]></tooltip>
+						<value><![CDATA[2024-12-09 05:00]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[queries]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select sample_time,ah.sql_id, count(*) number_of_sessions, dbms_lob.substr(sql_text,100)
+from DBA_HIST_ACTIVE_SESS_HISTORY ah  left join dba_hist_sqltext st on ah.sql_id=st.sql_id
+where 1=1
+and ah.sql_id like nvl(:sql_id , '%')
+and sample_time =:SAMPLE_TIME
+group by sample_time,ah.sql_id,  dbms_lob.substr(sql_text,100)
+order by sample_time,number_of_sessions desc, ah.sql_id]]></sql>
+					<binds>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<tooltip><![CDATA[sql_id]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="SAMPLE_TIME">
+							<prompt><![CDATA[SAMPLE_TIME]]></prompt>
+							<tooltip><![CDATA[SAMPLE_TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[events]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT NVL(a.event, 'ON CPU') AS event,
+       COUNT(*)*10 AS total_wait_time
+FROM   dba_hist_active_sess_history a
+WHERE  a.sample_time = :SAMPLE_TIME 
+and a.sql_id like nvl(:sql_id , '%')
+GROUP BY a.event
+ORDER BY total_wait_time DESC]]></sql>
+					<binds>
+						<bind id="SAMPLE_TIME">
+							<prompt><![CDATA[SAMPLE_TIME]]></prompt>
+							<tooltip><![CDATA[SAMPLE_TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<tooltip><![CDATA[sql_id]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[events_whole_period]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT :start_timestamp start_timestamp, :end_timestamp end_timestamp, NVL(a.event, 'ON CPU') AS event,
+       COUNT(*)*10 AS total_wait_time
+FROM   dba_hist_active_sess_history a
+WHERE  sample_time between to_timestamp(:start_timestamp, 'YYYY-MM-DD HH24:mi') and to_timestamp(:end_timestamp, 'YYYY-MM-DD HH24:mi')
+and a.sql_id like nvl(:sql_id , '%')
+GROUP BY a.event
+ORDER BY total_wait_time DESC]]></sql>
+					<binds>
+						<bind id="start_timestamp">
+							<prompt><![CDATA[start_timestamp]]></prompt>
+							<tooltip><![CDATA[start_timestamp]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="end_timestamp">
+							<prompt><![CDATA[end_timestamp]]></prompt>
+							<tooltip><![CDATA[end_timestamp]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<tooltip><![CDATA[sql_id]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+		</display>
 	</folder>
 	<display id="7b86f41a-018f-1000-803a-ac1900c08aaa" type="" style="Chart" enable="true">
 		<name><![CDATA[Wait Class History - minutes]]></name>
@@ -4792,8 +4963,8 @@ select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
 	</display>
 	<folder>
 		<name><![CDATA[CDB_PDB]]></name>
-		<tooltip><![CDATA[]]></tooltip>
-		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[CDB_PDB]]></tooltip>
+		<description><![CDATA[ ]]></description>
 			<display id="97b97c3d-0193-1000-8001-c0a8a1a8d6c3" type="" style="Table" enable="true">
 			<name><![CDATA[CONTAINERS]]></name>
 			<description><![CDATA[]]></description>
@@ -4807,7 +4978,7 @@ select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
 from GV$CONTAINERS
 order by 1,2]]></sql>
 			</query>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[PDBS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4829,7 +5000,7 @@ where (con_id=:CON_ID or :CON_ID is null)]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[PROPERTIES]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4852,7 +5023,7 @@ ORDER BY property_name, con_id]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[SERVICES]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4875,7 +5046,7 @@ ORDER BY service_id, con_id]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[SYSTEM_PARAMETER]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4904,7 +5075,7 @@ order by inst_id, name, con_id]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[PDB_HISTORY]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4919,7 +5090,7 @@ where (con_id=:CON_ID or :CON_ID is null)
 order by pdb_name,con_id, pdb_id, op_timestamp desc]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[CONTAINER_DATA]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4933,7 +5104,7 @@ from CDB_CONTAINER_DATA
 order by username, object_name, con_id]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[CDB_PDB_SAVED_STATES]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4946,7 +5117,7 @@ order by username, object_name, con_id]]></sql>
 from CDB_PDB_SAVED_STATES]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[USERS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -4969,7 +5140,7 @@ order by username, con_id]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[OBJECTS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5000,7 +5171,7 @@ order by owner, object_name, object_id]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[SEGMENTS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5030,7 +5201,7 @@ order by owner, SEGMENT_name--, object_id]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STORAGE]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
