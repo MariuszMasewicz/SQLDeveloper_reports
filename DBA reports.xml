@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <displays>
 <folder>
-	<name><![CDATA[Masel DBA reports]]></name>
-	<tooltip><![CDATA[Masel DBA reports]]></tooltip>
+	<name><![CDATA[DBA reports]]></name>
+	<tooltip><![CDATA[DBA reports]]></tooltip>
 	<description><![CDATA[ ]]></description>
 		<display id="e925b2bd-018c-1000-800d-ac120052d4bc" type="" style="Table" enable="true">
 		<name><![CDATA[ASM]]></name>
@@ -14,8 +14,10 @@
 		</CustomValues>
 		<query>
 			<sql><![CDATA[select --INST_ID, GROUP_NUMBER, NAME, SECTOR_SIZE, LOGICAL_SECTOR_SIZE, BLOCK_SIZE, ALLOCATION_UNIT_SIZE, STATE, TYPE, TOTAL_MB, FREE_MB, HOT_USED_MB, COLD_USED_MB, REQUIRED_MIRROR_FREE_MB, USABLE_FILE_MB, OFFLINE_DISKS, COMPATIBILITY, DATABASE_COMPATIBILITY, VOTING_FILES, CON_ID
-*
-from gv$asm_diskgroup]]></sql>
+'SQLDEV:GAUGE:0:100:0:0:'||round(((TOTAL_MB-FREE_MB)/TOTAL_MB)*100)  as space_usage,
+round(((TOTAL_MB-FREE_MB)/TOTAL_MB)*100) space_used_pct,
+d.*
+from gv$asm_diskgroup d]]></sql>
 		</query>
 		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Disks]]></name>
@@ -41,9 +43,17 @@ from gv$asm_disk a
 			</CustomValues>
 			<query>
 				<sql><![CDATA[select * 
-from gv$asm_alias a join gv$asm_file f on a.file_number=f.file_number and a.inst_id=f.inst_id
-where a.GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null 
+from gv$asm_alias a join gv$asm_file f on a.file_number=f.file_number and a.inst_id=f.inst_id and a.GROUP_NUMBER=f.GROUP_NUMBER
+where (a.GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null ) 
 order by bytes desc, a.name, a.inst_id]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -58,6 +68,14 @@ order by bytes desc, a.name, a.inst_id]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_DISK_STAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -72,6 +90,14 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 				<sql><![CDATA[select * 
 from GV$ASM_DISK_IOSTAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
+				<binds>
+					<bind id="GROUP_NUMBER">
+						<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+						<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -1176,6 +1202,20 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
   FROM cdb_temp_files
 where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) and (CON_ID= :CON_ID OR :CON_ID IS NULL))
 ORDER BY con_id, TABLESPACE_NAME, FILE_ID]]></sql>
+				<binds>
+					<bind id="TABLESPACE_LOGGROUP">
+						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
+						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="CON_ID">
+						<prompt><![CDATA[CON_ID]]></prompt>
+						<tooltip><![CDATA[CON_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -1191,6 +1231,14 @@ ORDER BY con_id, TABLESPACE_NAME, FILE_ID]]></sql>
   FROM v$log
 where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) IS NULL)
 ORDER BY group#, thread#]]></sql>
+				<binds>
+					<bind id="TABLESPACE_LOGGROUP">
+						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
+						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -1206,6 +1254,14 @@ ORDER BY group#, thread#]]></sql>
   FROM v$logfile
 where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) IS NULL)
 ORDER BY group#, MEMBER]]></sql>
+				<binds>
+					<bind id="TABLESPACE_LOGGROUP">
+						<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
+						<tooltip><![CDATA[TABLESPACE_LOGGROUP]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="plsql-dbms_output" enable="true">
@@ -3188,6 +3244,14 @@ order by username, con_id]]></sql>
 from dba_profiles
 where profile=:PROFILE or :PROFILE is null
 order by profile, resource_type, resource_name]]></sql>
+				<binds>
+					<bind id="PROFILE">
+						<prompt><![CDATA[PROFILE]]></prompt>
+						<tooltip><![CDATA[PROFILE]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select * 
@@ -3498,6 +3562,14 @@ order by owner, SEGMENT_name--, object_id]]></sql>
 from dba_SEGMENTS s
 where owner=:USERNAME
 order by owner, SEGMENT_name--, object_id]]></sql>
+				<binds>
+					<bind id="USERNAME">
+						<prompt><![CDATA[USERNAME]]></prompt>
+						<tooltip><![CDATA[USERNAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 	</display>
@@ -4805,162 +4877,6 @@ ORDER BY total_wait_time DESC]]></sql>
 			</display>
 		</display>
 	</folder>
-	<display id="7b86f41a-018f-1000-803a-ac1900c08aaa" type="" style="Chart" enable="true">
-		<name><![CDATA[Wait Class History - minutes]]></name>
-		<description><![CDATA[Average Active Sessions by Wait Class (1h)]]></description>
-		<tooltip><![CDATA[Average Active Sessions by Wait Class (About 1h History)]]></tooltip>
-		<drillclass><![CDATA[]]></drillclass>
-		<CustomValues>
-			<Y1AXIS_TITLE_TEXT><![CDATA[Average Active Sessions]]></Y1AXIS_TITLE_TEXT>
-			<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
-			<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
-			<PLOT_SERIES_OPTIONS_COLOR><![CDATA[\,-6710887,-3394816,-10066279,-16751002,-26368]]></PLOT_SERIES_OPTIONS_COLOR>
-			<Y1AXIS_REFOBJ_COUNT><![CDATA[0]]></Y1AXIS_REFOBJ_COUNT>
-			<Y1AXIS_REFOBJ_LINE_VALUE><![CDATA[\]]></Y1AXIS_REFOBJ_LINE_VALUE>
-			<TITLE_FONT.POSTURE><![CDATA[false]]></TITLE_FONT.POSTURE>
-			<Y1AXIS_NUMBER_FORMATS.TYPE><![CDATA[NUMBER]]></Y1AXIS_NUMBER_FORMATS.TYPE>
-			<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
-			<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
-			<TYPE><![CDATA[BAR_VERT_STACK]]></TYPE>
-			<STYLE><![CDATA[Default]]></STYLE>
-			<TITLE_ALIGNMENT><![CDATA[CENTER]]></TITLE_ALIGNMENT>
-			<TITLE_TEXT><![CDATA[Average Active Sessions by Wait Class]]></TITLE_TEXT>
-			<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
-			<Y1AXIS_NUMBER_FORMATS.NEGATIVE_NUMBER_FORMAT><![CDATA[BRACKETED]]></Y1AXIS_NUMBER_FORMATS.NEGATIVE_NUMBER_FORMAT>
-			<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
-			<TITLE_FONT.UNDERLINE><![CDATA[false]]></TITLE_FONT.UNDERLINE>
-			<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
-			<TITLE_FONT.NAME><![CDATA[SansSerif]]></TITLE_FONT.NAME>
-			<PLOT_HGRID_WIDTH><![CDATA[THINNEST]]></PLOT_HGRID_WIDTH>
-			<TITLE_FONT.COLOR><![CDATA[-12565927]]></TITLE_FONT.COLOR>
-			<TITLE_FONT.SIZE><![CDATA[14]]></TITLE_FONT.SIZE>
-			<PLOT_DATATIPS_CUMULATIVE_VALUE><![CDATA[true]]></PLOT_DATATIPS_CUMULATIVE_VALUE>
-			<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
-			<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
-			<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
-			<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
-			<GRADIENT><![CDATA[false]]></GRADIENT>
-			<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
-			<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
-			<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
-			<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
-			<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
-			<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
-			<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
-			<Y1AXIS_NUMBER_FORMATS.SCALE_FACTOR><![CDATA[NONE]]></Y1AXIS_NUMBER_FORMATS.SCALE_FACTOR>
-			<Y1AXIS_REFOBJ_VISIBLE><![CDATA[\]]></Y1AXIS_REFOBJ_VISIBLE>
-			<Y1AXIS_NUMBER_FORMATS.CURRENCY_SYMBOL><![CDATA[EUR_SYMBOL]]></Y1AXIS_NUMBER_FORMATS.CURRENCY_SYMBOL>
-			<DATA_MAP_COLNAMES><![CDATA[\,"AVERAGE_WAITER_COUNT","END_TIME","WAIT_CLASS"]]></DATA_MAP_COLNAMES>
-			<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
-			<TITLE_FONT.WEIGHT><![CDATA[true]]></TITLE_FONT.WEIGHT>
-			<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
-			<Y1AXIS_NUMBER_FORMATS.DECIMAL_PLACES><![CDATA[1]]></Y1AXIS_NUMBER_FORMATS.DECIMAL_PLACES>
-			<Y1AXIS_REFOBJ_TEXT><![CDATA[\]]></Y1AXIS_REFOBJ_TEXT>
-			<Y1AXIS_REFOBJ_WIDTH><![CDATA[\]]></Y1AXIS_REFOBJ_WIDTH>
-			<TITLE><![CDATA[true]]></TITLE>
-			<Y1AXIS_TITLE><![CDATA[true]]></Y1AXIS_TITLE>
-			<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
-			<PLOT_VGRID_WIDTH><![CDATA[THINNEST]]></PLOT_VGRID_WIDTH>
-			<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
-			<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
-			<Y1AXIS_REFOBJ_COLOR><![CDATA[\]]></Y1AXIS_REFOBJ_COLOR>
-		</CustomValues>
-		<query>
-			<sql><![CDATA[select * from (
-with WC as(
-select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
-  from V$EVENT_NAME e
-)
-select to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) time
-     , wc.WAIT_CLASS
-     , round( AVERAGE_WAITER_COUNT, 2 ) AVERAGE_WAITER_COUNT
-  from GV$WAITCLASSMETRIC_HISTORY h
-     , WC
- where h.WAIT_CLASS_ID = wc.WAIT_CLASS_ID
-   and wc.WAIT_CLASS <> 'Idle'
-   and h.INST_ID = ( select INST_ID from V$INSTANCE )
-   and END_TIME between sysdate- nvl(:start_hours,30)/(24*60) and sysdate- nvl(:end_hours,0)/(24*60)
-union all
-select to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) time
-     , '_CPU' as WAIT_CLASS
-     , round( sh.VALUE / 100, 2 ) AVERAGE_WAITER_COUNT
-  from GV$SYSMETRIC_HISTORY sh
- where sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
-   and sh.INST_ID = ( select INST_ID from V$INSTANCE )
-   and END_TIME between sysdate- nvl(:start_hours,30)/(24*60) and sysdate- nvl(:end_hours,0)/(24*60)
-)
---where rownum < 1000
-order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
-			<binds>
-				<bind id="start_hours">
-					<prompt><![CDATA[start_hours]]></prompt>
-					<tooltip><![CDATA[start_hours]]></tooltip>
-					<value><![CDATA[30]]></value>
-					<bracket><![CDATA[null]]></bracket>
-				</bind>
-				<bind id="end_hours">
-					<prompt><![CDATA[end_hours]]></prompt>
-					<tooltip><![CDATA[end_hours]]></tooltip>
-					<value><![CDATA[0]]></value>
-					<bracket><![CDATA[null]]></bracket>
-				</bind>
-			</binds>
-		</query>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[GV$WAITCLASSMETRIC_HISTORY]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select wc.wait_class, h.*
-  from GV$WAITCLASSMETRIC_HISTORY h
-     , (
-select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
-  from V$EVENT_NAME e
-) WC
- where h.WAIT_CLASS_ID = wc.WAIT_CLASS_ID
-   --and wc.WAIT_CLASS <> 'Idle'
-   and h.INST_ID = ( select INST_ID from V$INSTANCE )
-   and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
-				<binds>
-					<bind id="TIME">
-						<prompt><![CDATA[TIME]]></prompt>
-						<tooltip><![CDATA[TIME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[GV$SYSMETRIC_HISTORY]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select sh.*
- from GV$SYSMETRIC_HISTORY sh
- where 1=1
-   --and sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
-   and sh.INST_ID = ( select INST_ID from V$INSTANCE )
-   and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
-				<binds>
-					<bind id="TIME">
-						<prompt><![CDATA[TIME]]></prompt>
-						<tooltip><![CDATA[TIME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-	</display>
 	<folder>
 		<name><![CDATA[CDB_PDB]]></name>
 		<tooltip><![CDATA[CDB_PDB]]></tooltip>
@@ -5088,6 +5004,14 @@ order by inst_id, name, con_id]]></sql>
 from CDB_PDB_HISTORY 
 where (con_id=:CON_ID or :CON_ID is null) 
 order by pdb_name,con_id, pdb_id, op_timestamp desc]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -5269,6 +5193,362 @@ left outer join (
 							<bracket><![CDATA[null]]></bracket>
 						</bind>
 					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[TABLESPACES]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT m.con_id, m.tablespace_name,
+    'SQLDEV:GAUGE:0:100:0:0:'||round(max(m.used_percent))  as PERC_to_max_tbs_size_gauge,
+    round(max(m.used_percent),1) PERC_to_max_tbs_size,
+    'SQLDEV:GAUGE:0:100:0:0:'||round(max(m.used_space*t.block_size)*100/(sum(d.bytes)*count(distinct d.file_id)/count(d.file_id)),1)  as PER_to_actual_tbs_size_gauge,
+    round(max(m.used_space*t.block_size)*100/(sum(d.bytes)*count(distinct d.file_id)/count(d.file_id)),1) PER_to_actual_tbs_size,
+    round(max(m.tablespace_size*t.block_size/1024/1024),1) max_tbs_size,
+    round((sum(d.bytes)*count(distinct d.file_id))/count(d.file_id)/1024/1024,1) actual_tbs_size,
+    round(max(m.used_space*t.block_size/1024/1024),1) USED,
+    round(max((m.tablespace_size-m.used_space)*t.block_size/1024/1024),1) FREE_to_max_tbs_size,
+    round(((sum(d.bytes)*count(distinct d.file_id))/count(d.file_id)-max(m.used_space*t.block_size))/1024/1024,1) FREE_to_actual_tbs_size,    
+    count(distinct d.file_id) number_of_files,
+    max(to_number(tt.warning_value)) WARN,
+    max(to_number(tt.critical_value)) CRIT,
+    max(case when m.used_percent>tt.warning_value OR m.used_percent>tt.critical_value then 'NO!' else 'OK' end) "OK?", 
+  'DROP TABLESPACE "'||m.tablespace_name||'" INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS;' as drop_tablespace,
+  'ALTER TABLESPACE "'||m.tablespace_name||'" READ ONLY;' as read_only,
+  'ALTER TABLESPACE "'||m.tablespace_name||'" READ WRITE;' as read_write,
+  'ALTER TABLESPACE "'||m.tablespace_name||'" OFFLINE IMMEDIATE;' as go_offline,
+  'ALTER TABLESPACE "'||m.tablespace_name||'" ONLINE;' as go_online,
+  'ALTER TABLESPACE "'||m.tablespace_name||'" ADD DATAFILE ''/path/name'' SIZE 100K AUTOEXTEND ON NEXT 100K MAXSIZE UNLIMITED' as add_datafile
+FROM  cdb_tablespace_usage_metrics m, cdb_tablespaces t, cdb_data_files d, cdb_thresholds tt
+WHERE (m.tablespace_name=t.tablespace_name and m.con_id=t.con_id)
+AND (d.tablespace_name=t.tablespace_name and d.con_id=t.con_id)
+and tt.metrics_name='Tablespace Space Usage'
+and tt.object_name is null
+and (m.con_id=:CON_ID or :CON_ID is null)
+GROUP BY m.con_id, m.tablespace_name
+order by 1,2]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+		</display>
+	</folder>
+	<folder>
+		<name><![CDATA[Performance]]></name>
+		<tooltip><![CDATA[Performance]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="7b86f41a-018f-1000-803a-ac1900c08aaa" type="" style="Chart" enable="true">
+			<name><![CDATA[Wait Class History - minutes]]></name>
+			<description><![CDATA[Average Active Sessions by Wait Class (1h)]]></description>
+			<tooltip><![CDATA[Average Active Sessions by Wait Class (About 1h History)]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<Y1AXIS_TITLE_TEXT><![CDATA[Average Active Sessions]]></Y1AXIS_TITLE_TEXT>
+				<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+				<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+				<PLOT_SERIES_OPTIONS_COLOR><![CDATA[\,-6710887,-3394816,-10066279,-16751002,-26368]]></PLOT_SERIES_OPTIONS_COLOR>
+				<Y1AXIS_REFOBJ_COUNT><![CDATA[0]]></Y1AXIS_REFOBJ_COUNT>
+				<Y1AXIS_REFOBJ_LINE_VALUE><![CDATA[\]]></Y1AXIS_REFOBJ_LINE_VALUE>
+				<TITLE_FONT.POSTURE><![CDATA[false]]></TITLE_FONT.POSTURE>
+				<Y1AXIS_NUMBER_FORMATS.TYPE><![CDATA[NUMBER]]></Y1AXIS_NUMBER_FORMATS.TYPE>
+				<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
+				<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+				<TYPE><![CDATA[BAR_VERT_STACK]]></TYPE>
+				<STYLE><![CDATA[Default]]></STYLE>
+				<TITLE_ALIGNMENT><![CDATA[CENTER]]></TITLE_ALIGNMENT>
+				<TITLE_TEXT><![CDATA[Average Active Sessions by Wait Class]]></TITLE_TEXT>
+				<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+				<Y1AXIS_NUMBER_FORMATS.NEGATIVE_NUMBER_FORMAT><![CDATA[BRACKETED]]></Y1AXIS_NUMBER_FORMATS.NEGATIVE_NUMBER_FORMAT>
+				<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+				<TITLE_FONT.UNDERLINE><![CDATA[false]]></TITLE_FONT.UNDERLINE>
+				<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+				<TITLE_FONT.NAME><![CDATA[SansSerif]]></TITLE_FONT.NAME>
+				<PLOT_HGRID_WIDTH><![CDATA[THINNEST]]></PLOT_HGRID_WIDTH>
+				<TITLE_FONT.COLOR><![CDATA[-12565927]]></TITLE_FONT.COLOR>
+				<TITLE_FONT.SIZE><![CDATA[14]]></TITLE_FONT.SIZE>
+				<PLOT_DATATIPS_CUMULATIVE_VALUE><![CDATA[true]]></PLOT_DATATIPS_CUMULATIVE_VALUE>
+				<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+				<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+				<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+				<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+				<GRADIENT><![CDATA[false]]></GRADIENT>
+				<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+				<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+				<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+				<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+				<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
+				<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+				<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+				<Y1AXIS_NUMBER_FORMATS.SCALE_FACTOR><![CDATA[NONE]]></Y1AXIS_NUMBER_FORMATS.SCALE_FACTOR>
+				<Y1AXIS_REFOBJ_VISIBLE><![CDATA[\]]></Y1AXIS_REFOBJ_VISIBLE>
+				<Y1AXIS_NUMBER_FORMATS.CURRENCY_SYMBOL><![CDATA[EUR_SYMBOL]]></Y1AXIS_NUMBER_FORMATS.CURRENCY_SYMBOL>
+				<DATA_MAP_COLNAMES><![CDATA[\,"AVERAGE_WAITER_COUNT","END_TIME","WAIT_CLASS"]]></DATA_MAP_COLNAMES>
+				<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+				<TITLE_FONT.WEIGHT><![CDATA[true]]></TITLE_FONT.WEIGHT>
+				<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+				<Y1AXIS_NUMBER_FORMATS.DECIMAL_PLACES><![CDATA[1]]></Y1AXIS_NUMBER_FORMATS.DECIMAL_PLACES>
+				<Y1AXIS_REFOBJ_TEXT><![CDATA[\]]></Y1AXIS_REFOBJ_TEXT>
+				<Y1AXIS_REFOBJ_WIDTH><![CDATA[\]]></Y1AXIS_REFOBJ_WIDTH>
+				<TITLE><![CDATA[true]]></TITLE>
+				<Y1AXIS_TITLE><![CDATA[true]]></Y1AXIS_TITLE>
+				<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+				<PLOT_VGRID_WIDTH><![CDATA[THINNEST]]></PLOT_VGRID_WIDTH>
+				<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+				<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+				<Y1AXIS_REFOBJ_COLOR><![CDATA[\]]></Y1AXIS_REFOBJ_COLOR>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * from (
+with WC as(
+select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
+  from V$EVENT_NAME e
+)
+select to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) time
+     , wc.WAIT_CLASS
+     , sum(round( AVERAGE_WAITER_COUNT, 2 )) AVERAGE_WAITER_COUNT
+  from GV$WAITCLASSMETRIC_HISTORY h
+     , WC
+ where h.WAIT_CLASS_ID = wc.WAIT_CLASS_ID
+   and wc.WAIT_CLASS <> 'Idle'
+   and h.INST_ID = ( select INST_ID from V$INSTANCE )
+   and END_TIME between sysdate- nvl(:start_hours,30)/(24) and sysdate- nvl(:end_hours,0)/(24)
+ group by to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) 
+     , wc.WAIT_CLASS
+union all
+select to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) time
+     , '_CPU' as WAIT_CLASS
+     , sum(round( sh.VALUE / 100, 2 )) AVERAGE_WAITER_COUNT
+  from GV$SYSMETRIC_HISTORY sh
+ where sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
+   and sh.INST_ID = ( select INST_ID from V$INSTANCE )
+   and END_TIME between sysdate- nvl(:start_hours,30)/(24) and sysdate- nvl(:end_hours,0)/(24)
+  group by to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) 
+     , '_CPU' 
+)
+--where rownum < 1000
+order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
+				<binds>
+					<bind id="start_hours">
+						<prompt><![CDATA[start_hours]]></prompt>
+						<tooltip><![CDATA[start_hours]]></tooltip>
+						<value><![CDATA[30]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="end_hours">
+						<prompt><![CDATA[end_hours]]></prompt>
+						<tooltip><![CDATA[end_hours]]></tooltip>
+						<value><![CDATA[0]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[GV$WAITCLASSMETRIC_HISTORY]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select wc.wait_class, h.*
+  from GV$WAITCLASSMETRIC_HISTORY h
+     , (
+select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
+  from V$EVENT_NAME e
+) WC
+ where h.WAIT_CLASS_ID = wc.WAIT_CLASS_ID
+   --and wc.WAIT_CLASS <> 'Idle'
+   and h.INST_ID = ( select INST_ID from V$INSTANCE )
+   and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
+					<binds>
+						<bind id="TIME">
+							<prompt><![CDATA[TIME]]></prompt>
+							<tooltip><![CDATA[TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[GV$SYSMETRIC_HISTORY]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select sh.*
+ from GV$SYSMETRIC_HISTORY sh
+ where 1=1
+   --and sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
+   and sh.INST_ID = ( select INST_ID from V$INSTANCE )
+   and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
+				</query>
+			</display>
+		</display>
+		<display id="ba08712b-0193-1000-800b-c0a8a168f6fb" type="" style="Chart" enable="true">
+			<name><![CDATA[Wait Class History - hours]]></name>
+			<description><![CDATA[Average Active Sessions by Wait Class (1h)]]></description>
+			<tooltip><![CDATA[Average Active Sessions by Wait Class (About 1h History)]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<Y1AXIS_TITLE_TEXT><![CDATA[Average Active Sessions]]></Y1AXIS_TITLE_TEXT>
+				<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+				<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+				<PLOT_SERIES_OPTIONS_COLOR><![CDATA[\,-6710887,-3394816,-10066279,-16751002,-26368]]></PLOT_SERIES_OPTIONS_COLOR>
+				<Y1AXIS_REFOBJ_COUNT><![CDATA[0]]></Y1AXIS_REFOBJ_COUNT>
+				<Y1AXIS_REFOBJ_LINE_VALUE><![CDATA[\]]></Y1AXIS_REFOBJ_LINE_VALUE>
+				<TITLE_FONT.POSTURE><![CDATA[false]]></TITLE_FONT.POSTURE>
+				<Y1AXIS_NUMBER_FORMATS.TYPE><![CDATA[NUMBER]]></Y1AXIS_NUMBER_FORMATS.TYPE>
+				<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
+				<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+				<TYPE><![CDATA[BAR_VERT_STACK]]></TYPE>
+				<STYLE><![CDATA[Default]]></STYLE>
+				<TITLE_ALIGNMENT><![CDATA[CENTER]]></TITLE_ALIGNMENT>
+				<TITLE_TEXT><![CDATA[Average Active Sessions by Wait Class]]></TITLE_TEXT>
+				<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+				<Y1AXIS_NUMBER_FORMATS.NEGATIVE_NUMBER_FORMAT><![CDATA[BRACKETED]]></Y1AXIS_NUMBER_FORMATS.NEGATIVE_NUMBER_FORMAT>
+				<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+				<TITLE_FONT.UNDERLINE><![CDATA[false]]></TITLE_FONT.UNDERLINE>
+				<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+				<TITLE_FONT.NAME><![CDATA[SansSerif]]></TITLE_FONT.NAME>
+				<PLOT_HGRID_WIDTH><![CDATA[THINNEST]]></PLOT_HGRID_WIDTH>
+				<TITLE_FONT.COLOR><![CDATA[-12565927]]></TITLE_FONT.COLOR>
+				<TITLE_FONT.SIZE><![CDATA[14]]></TITLE_FONT.SIZE>
+				<PLOT_DATATIPS_CUMULATIVE_VALUE><![CDATA[true]]></PLOT_DATATIPS_CUMULATIVE_VALUE>
+				<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+				<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+				<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+				<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+				<GRADIENT><![CDATA[false]]></GRADIENT>
+				<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+				<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+				<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+				<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+				<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
+				<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+				<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+				<Y1AXIS_NUMBER_FORMATS.SCALE_FACTOR><![CDATA[NONE]]></Y1AXIS_NUMBER_FORMATS.SCALE_FACTOR>
+				<Y1AXIS_REFOBJ_VISIBLE><![CDATA[\]]></Y1AXIS_REFOBJ_VISIBLE>
+				<Y1AXIS_NUMBER_FORMATS.CURRENCY_SYMBOL><![CDATA[EUR_SYMBOL]]></Y1AXIS_NUMBER_FORMATS.CURRENCY_SYMBOL>
+				<DATA_MAP_COLNAMES><![CDATA[\,"AVERAGE_WAITER_COUNT","END_TIME","WAIT_CLASS"]]></DATA_MAP_COLNAMES>
+				<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+				<TITLE_FONT.WEIGHT><![CDATA[true]]></TITLE_FONT.WEIGHT>
+				<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+				<Y1AXIS_NUMBER_FORMATS.DECIMAL_PLACES><![CDATA[1]]></Y1AXIS_NUMBER_FORMATS.DECIMAL_PLACES>
+				<Y1AXIS_REFOBJ_TEXT><![CDATA[\]]></Y1AXIS_REFOBJ_TEXT>
+				<Y1AXIS_REFOBJ_WIDTH><![CDATA[\]]></Y1AXIS_REFOBJ_WIDTH>
+				<TITLE><![CDATA[true]]></TITLE>
+				<Y1AXIS_TITLE><![CDATA[true]]></Y1AXIS_TITLE>
+				<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+				<PLOT_VGRID_WIDTH><![CDATA[THINNEST]]></PLOT_VGRID_WIDTH>
+				<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+				<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+				<Y1AXIS_REFOBJ_COLOR><![CDATA[\]]></Y1AXIS_REFOBJ_COLOR>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * from (
+with WC as(
+select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
+  from V$EVENT_NAME e
+)
+select to_char( END_TIME, 'yyyy-mm-dd hh24' ) time
+     , wc.WAIT_CLASS
+     , sum(round( AVERAGE_WAITER_COUNT, 2 )) AVERAGE_WAITER_COUNT
+  from GV$WAITCLASSMETRIC_HISTORY h
+     , WC
+ where h.WAIT_CLASS_ID = wc.WAIT_CLASS_ID
+   and wc.WAIT_CLASS <> 'Idle'
+   and h.INST_ID = ( select INST_ID from V$INSTANCE )
+   and END_TIME between sysdate- nvl(:start_hours,30)/(24) and sysdate- nvl(:end_hours,0)/(24)
+ group by to_char( END_TIME, 'yyyy-mm-dd hh24' ) 
+     , wc.WAIT_CLASS
+union all
+select to_char( END_TIME, 'yyyy-mm-dd hh24' ) time
+     , '_CPU' as WAIT_CLASS
+     , sum(round( sh.VALUE / 100, 2 )) AVERAGE_WAITER_COUNT
+  from GV$SYSMETRIC_HISTORY sh
+ where sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
+   and sh.INST_ID = ( select INST_ID from V$INSTANCE )
+   and END_TIME between sysdate- nvl(:start_hours,30)/(24) and sysdate- nvl(:end_hours,0)/(24)
+  group by to_char( END_TIME, 'yyyy-mm-dd hh24' ) 
+     , '_CPU' 
+)
+--where rownum < 1000
+order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
+				<binds>
+					<bind id="start_hours">
+						<prompt><![CDATA[start_hours]]></prompt>
+						<tooltip><![CDATA[start_hours]]></tooltip>
+						<value><![CDATA[30]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="end_hours">
+						<prompt><![CDATA[end_hours]]></prompt>
+						<tooltip><![CDATA[end_hours]]></tooltip>
+						<value><![CDATA[0]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[GV$WAITCLASSMETRIC_HISTORY]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select wc.wait_class, h.*
+  from GV$WAITCLASSMETRIC_HISTORY h
+     , (
+select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
+  from V$EVENT_NAME e
+) WC
+ where h.WAIT_CLASS_ID = wc.WAIT_CLASS_ID
+   --and wc.WAIT_CLASS <> 'Idle'
+   and h.INST_ID = ( select INST_ID from V$INSTANCE )
+   and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
+					<binds>
+						<bind id="TIME">
+							<prompt><![CDATA[TIME]]></prompt>
+							<tooltip><![CDATA[TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[GV$SYSMETRIC_HISTORY]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select sh.*
+ from GV$SYSMETRIC_HISTORY sh
+ where 1=1
+   --and sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
+   and sh.INST_ID = ( select INST_ID from V$INSTANCE )
+   and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
 				</query>
 			</display>
 		</display>
