@@ -5489,14 +5489,14 @@ from gv$services s
 order by inst_id,service_id]]></sql>
 		</query>
 		<display id="null" type="" style="Table" enable="true">
-			<name><![CDATA[dba_services]]></name>
+			<name><![CDATA[cdb_services]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
 			<drillclass><![CDATA[]]></drillclass>
 			<CustomValues>
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
-			<query>
+			<query maxversion="11">
 				<sql><![CDATA[select * 
 from dba_services
 where (service_id=:SERVICE_ID or :SERVICE_ID is null)
@@ -5509,6 +5509,12 @@ order by service_id]]></sql>
 						<bracket><![CDATA[null]]></bracket>
 					</bind>
 				</binds>
+			</query>
+			<query minversion="12">
+				<sql><![CDATA[select * 
+from cdb_services
+where (service_id=:SERVICE_ID or :SERVICE_ID is null)
+order by con_id, service_id]]></sql>
 			</query>
 		</display>
 		<display id="null" type="" style="Table" enable="true">
@@ -5599,20 +5605,6 @@ order by inst_id,service_name, wait_class#]]></sql>
 from gv$servicemetric
 where (service_name=:NAME and inst_id=:INST_ID) or (:NAME is null and :INST_ID is null)
 order by inst_id,service_name]]></sql>
-				<binds>
-					<bind id="NAME">
-						<prompt><![CDATA[NAME]]></prompt>
-						<tooltip><![CDATA[NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="INST_ID">
-						<prompt><![CDATA[INST_ID]]></prompt>
-						<tooltip><![CDATA[INST_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
 		<display id="null" type="" style="Table" enable="true">
@@ -5628,20 +5620,6 @@ order by inst_id,service_name]]></sql>
 from gv$servicemetric_history
 where (service_name=:NAME and inst_id=:INST_ID) or (:NAME is null and :INST_ID is null)
 order by inst_id,service_name, begin_time desc]]></sql>
-				<binds>
-					<bind id="NAME">
-						<prompt><![CDATA[NAME]]></prompt>
-						<tooltip><![CDATA[NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="INST_ID">
-						<prompt><![CDATA[INST_ID]]></prompt>
-						<tooltip><![CDATA[INST_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 		</display>
 	</display>
