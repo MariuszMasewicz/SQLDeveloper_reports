@@ -196,7 +196,7 @@ from gv$asm_operation a
 		<CustomValues>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
-		<query minversion="12">
+		<query>
 			<sql><![CDATA[select 
 'SQLDEV:LINK:'
        || owner
@@ -214,7 +214,7 @@ j.*,
 from cdb_scheduler_jobs j
 order by owner, job_name]]></sql>
 		</query>
-		<query maxversion="11">
+		<query>
 			<sql><![CDATA[select 
 'SQLDEV:LINK:'
        || owner
@@ -3322,16 +3322,6 @@ order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
 		<query>
-			<sql><![CDATA[select u.*, 
-  'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
-  'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
-  'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
-  'alter session set current_schema = "'||u.username||'";' as change_schema,
-  'DROP USER "'||u.username||'" CASCADE;' as drop_user
-from dba_users u
-order by username]]></sql>
-		</query>
-		<query>
 			<sql><![CDATA[select 
 'SQLDEV:LINK:'
        || username
@@ -3345,11 +3335,13 @@ u.*,
   'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
   'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
   'alter session set current_schema = "'||u.username||'";' as change_schema,
+  'alter user "'||u.username||'" default tablespace <TBS NAME>;' change_tablespace,
+  'alter user "'||u.username||'" default temporary tablespace <TEMP NAME>;' change_temp_tablespace,
   'DROP USER "'||u.username||'" CASCADE;' as drop_user
 from cdb_users u
 order by username, con_id]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[UserProfile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3378,7 +3370,7 @@ where ((profile=:PROFILE or :PROFILE is null) and (CON_ID=:CON_ID or :CON_ID is 
 order by profile, resource_type, resource_name, CON_ID]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[ObjectPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3399,7 +3391,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, owner, table_name, privilege, con_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SystemPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3412,14 +3404,6 @@ order by grantee, owner, table_name, privilege, con_id]]></sql>
 from DBA_SYS_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, privilege]]></sql>
-				<binds>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select * 
@@ -3428,7 +3412,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, privilege, con_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Roles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3449,7 +3433,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, granted_role, con_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[All Privileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3520,7 +3504,7 @@ start with grantee is null
 connect by grantee = prior granted_role]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[UserObjects]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3557,7 +3541,7 @@ where owner=:USERNAME
 order by owner, object_name, object_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[UserSegments]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5796,46 +5780,14 @@ order by con_id, owner, segment_name, partition_name]]></sql>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
 		<query>
-			<sql><![CDATA[SELECT 
-   a.inst_id,
-   a.con_id,
-   A.tablespace_name tablespace, 
-   round(D.mb_total,0),
-   round(SUM (A.used_blocks * D.block_size) / 1024 / 1024,0) mb_used,
-   round(D.mb_total - SUM (A.used_blocks * D.block_size) / 1024 / 1024,0) mb_free,
-   round(((SUM (A.used_blocks * D.block_size) / 1024 / 1024)/D.mb_total)*100,2) as percent_use,
-   'SQLDEV:GAUGE:0:100:0:0:'||round(((SUM (A.used_blocks * D.block_size) / 1024 / 1024)/D.mb_total)*100,2)  as PERC_USE
-FROM 
-   gv$sort_segment A,
-(
-SELECT 
-   b.inst_id,
-   b.con_id,
-   B.name, 
-   C.block_size, 
-   SUM (C.bytes) / 1024 / 1024 mb_total
-FROM 
-   gv$tablespace B, 
-   gv$tempfile C
-WHERE 
-   B.ts#= C.ts# 
-   and b.inst_id=c.inst_id
-   and b.con_id=c.con_id
-GROUP BY 
-   b.inst_id,
-   b.con_id,
-   B.name, 
-   C.block_size
-) D
-WHERE 
-   A.tablespace_name = D.name
-   and a.inst_id=d.inst_id
-   and a.con_id=d.con_id
-GROUP by 
-  a.inst_id,
-  a.con_id,
-   A.tablespace_name, 
-   D.mb_total]]></sql>
+			<sql><![CDATA[select 
+  round(used_blocks/total_blocks,2) as percent_use,
+  'SQLDEV:GAUGE:0:100:0:0:'||round(used_blocks/total_blocks,2)  as PERC_USE,
+  ss.*,
+  'alter database default temporary tablespace '||tablespace_name||';' set_as_default
+  /*inst_id, tablespace_name, segment_file, total_blocks,
+        used_blocks, free_blocks, max_used_blocks, max_sort_blocks */
+from gv$sort_segment ss]]></sql>
 		</query>
 		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Sessions]]></name>
@@ -5846,7 +5798,45 @@ GROUP by
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
 			<query>
-				<sql><![CDATA[SELECT b.tablespace,
+				<sql><![CDATA[SELECT
+i.instance_name instance_name
+, t.tablespace tablespace_name
+, s.sid sid
+, s.serial# serial_id
+, s.status session_status
+, s.username oracle_username
+, s.osuser os_username
+, p.spid os_pid
+, s.program session_program
+, s.sql_id
+, t.contents contents
+, t.segtype segtype
+, t.extents 
+, t.blocks
+, (t.blocks * c.value) bytes
+, a.sql_text
+, 'ALTER SYSTEM KILL SESSION '''||s.sid||','|| s.serial#||', @'||s.inst_id||''' IMMEDIATE;' as kill_stmt
+FROM
+gv$instance i
+, gv$session s
+, gv$process p
+, gv$sort_usage t
+, v$sqlarea a
+, (select value from v$parameter
+where name = 'db_block_size') c
+WHERE
+s.inst_id = p.inst_id
+AND p.inst_id = i.inst_id
+AND t.inst_id = i.inst_id
+AND s.inst_id = i.inst_id
+AND s.saddr = t.session_addr
+AND s.paddr = p.addr
+AND a.address=s.sql_address
+and a.hash_value=s.sql_hash_value
+ORDER BY
+(t.blocks * c.value) desc
+
+/*SELECT b.tablespace,
        ROUND(((b.blocks*p.value)/1024/1024),2) AS temp_size_MB,
        a.inst_id as Instance,
        a.sid||','||a.serial# AS sid_serial,
@@ -5862,7 +5852,7 @@ WHERE  p.name  = 'db_block_size'
 AND    a.saddr = b.session_addr
 AND    a.inst_id=b.inst_id
 AND    a.inst_id=p.inst_id
-ORDER BY temp_size_MB desc --b.tablespace, b.blocks]]></sql>
+ORDER BY temp_size_MB desc --b.tablespace, b.blocks */]]></sql>
 			</query>
 		</display>
 		<display id="null" type="" style="Table" enable="true">
@@ -5877,6 +5867,44 @@ ORDER BY temp_size_MB desc --b.tablespace, b.blocks]]></sql>
 				<sql><![CDATA[select * 
 from cdb_temp_files
 order by con_id,file_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[gv$temp_extent_pool]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select tep.* /*,inst_id, tablespace_name, blocks_cached, blocks_used */
+from gv$temp_extent_pool tep]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[gv$temp_space_header]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select tsh.* /*, inst_id,tablespace_name, blocks_used, blocks_free */
+from gv$temp_space_header tsh]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[Parameters]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT property_name,property_value FROM DATABASE_PROPERTIES where PROPERTY_NAME like '%TEMP%']]></sql>
 			</query>
 		</display>
 	</display>
