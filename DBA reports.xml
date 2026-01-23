@@ -222,25 +222,7 @@ j.*,
 from cdb_scheduler_jobs j
 order by owner, job_name]]></sql>
 		</query>
-		<query>
-			<sql><![CDATA[select 
-'SQLDEV:LINK:'
-       || owner
-       || ':'
-       || 'SCHNEWJOB' -- object_type
-       || ':'
-       || job_name
-       || ':'||job_name||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS details,
-j.*,
-'exec DBMS_SCHEDULER.enable(name=>''"'||owner||'"."'||job_name||'"'');' enable_job,
-'exec DBMS_SCHEDULER.disable(name=>''"'||owner||'"."'||job_name||'"'', force => TRUE);' disable_job,
-'exec DBMS_SCHEDULER.RUN_JOB(name=>''"'||owner||'"."'||job_name||'"'', USE_CURRENT_SESSION => FALSE);' run_job,
-'exec DBMS_SCHEDULER.STOP_JOB(job_name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE);' stop_job,
-'exec DBMS_SCHEDULER.DROP_JOB(name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE, defer => TRUE);' drop_job
-from dba_scheduler_jobs j
-order by owner, job_name]]></sql>
-		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Running jobs]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -250,12 +232,12 @@ order by owner, job_name]]></sql>
 			</CustomValues>
 			<query>
 				<sql><![CDATA[select * 
-from DBA_SCHEDULER_RUNNING_JOBS
+from CDB_SCHEDULER_RUNNING_JOBS
 --where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
 order by owner, job_name]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Job run details]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -269,9 +251,29 @@ from cdb_SCHEDULER_JOB_RUN_DETAILS
 where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
   and (CON_ID=:CON_ID)
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
+				<binds>
+					<bind id="OWNER">
+						<prompt><![CDATA[OWNER]]></prompt>
+						<tooltip><![CDATA[OWNER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="JOB_NAME">
+						<prompt><![CDATA[JOB_NAME]]></prompt>
+						<tooltip><![CDATA[JOB_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="CON_ID">
+						<prompt><![CDATA[CON_ID]]></prompt>
+						<tooltip><![CDATA[CON_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Job log]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -285,9 +287,29 @@ from CDB_SCHEDULER_JOB_LOG
 where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
   and (CON_ID=:CON_ID)
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
+				<binds>
+					<bind id="OWNER">
+						<prompt><![CDATA[OWNER]]></prompt>
+						<tooltip><![CDATA[OWNER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="JOB_NAME">
+						<prompt><![CDATA[JOB_NAME]]></prompt>
+						<tooltip><![CDATA[JOB_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="CON_ID">
+						<prompt><![CDATA[CON_ID]]></prompt>
+						<tooltip><![CDATA[CON_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Global attribute]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -297,11 +319,11 @@ order by LOG_ID desc --,LOG_DATE desc]]></sql>
 			</CustomValues>
 			<query>
 				<sql><![CDATA[select * 
-from DBA_SCHEDULER_GLOBAL_ATTRIBUTE
+from cdb_SCHEDULER_GLOBAL_ATTRIBUTE
 order by ATTRIBUTE_NAME]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Instance parameters]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -316,7 +338,7 @@ order by ATTRIBUTE_NAME]]></sql>
 order by isdefault, name]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Chart" enable="true">
+		<display id="null" type="" style="Chart" enable="true">
 			<name><![CDATA[Job duration and CPU]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -377,13 +399,27 @@ abs( extract( second from CPU_USED )
           + extract( hour from CPU_USED ) * 60 * 60 
           + extract( day from CPU_USED ) * 60 * 60 * 24
             ) as CPU_USED_SEC
-from DBA_SCHEDULER_JOB_RUN_DETAILS j
+from cdb_SCHEDULER_JOB_RUN_DETAILS j
 where 
   (OWNER=:OWNER and JOB_name=:JOB_NAME) 
 order by LOG_DATE]]></sql>
+				<binds>
+					<bind id="OWNER">
+						<prompt><![CDATA[OWNER]]></prompt>
+						<tooltip><![CDATA[OWNER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="JOB_NAME">
+						<prompt><![CDATA[JOB_NAME]]></prompt>
+						<tooltip><![CDATA[JOB_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[AutoTasks]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -395,10 +431,10 @@ order by LOG_DATE]]></sql>
 				<sql><![CDATA[select a.* ,
 'exec DBMS_AUTO_TASK_ADMIN.ENABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as enable,
 'exec DBMS_AUTO_TASK_ADMIN.DISABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as disable
-from DBA_AUTOTASK_CLIENT a]]></sql>
+from cdb_AUTOTASK_CLIENT a]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[AutoStatsExecutions]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -408,7 +444,7 @@ from DBA_AUTOTASK_CLIENT a]]></sql>
 			</CustomValues>
 			<query>
 				<sql><![CDATA[select * 
-from DBA_AUTO_STAT_EXECUTIONS]]></sql>
+from cdb_AUTO_STAT_EXECUTIONS]]></sql>
 			</query>
 		</display>
 	</display>
@@ -3302,16 +3338,6 @@ order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
 		<query>
-			<sql><![CDATA[select u.*, 
-  'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
-  'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
-  'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
-  'alter session set current_schema = "'||u.username||'";' as change_schema,
-  'DROP USER "'||u.username||'" CASCADE;' as drop_user
-from dba_users u
-order by username]]></sql>
-		</query>
-		<query>
 			<sql><![CDATA[select 
 'SQLDEV:LINK:'
        || username
@@ -3325,11 +3351,13 @@ u.*,
   'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
   'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
   'alter session set current_schema = "'||u.username||'";' as change_schema,
+  'alter user "'||u.username||'" default tablespace <TBS NAME>;' change_tablespace,
+  'alter user "'||u.username||'" default temporary tablespace <TEMP NAME>;' change_temp_tablespace,
   'DROP USER "'||u.username||'" CASCADE;' as drop_user
 from cdb_users u
 order by username, con_id]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[UserProfile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3342,14 +3370,6 @@ order by username, con_id]]></sql>
 from dba_profiles
 where profile=:PROFILE or :PROFILE is null
 order by profile, resource_type, resource_name]]></sql>
-				<binds>
-					<bind id="PROFILE">
-						<prompt><![CDATA[PROFILE]]></prompt>
-						<tooltip><![CDATA[PROFILE]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select * 
@@ -3358,7 +3378,7 @@ where ((profile=:PROFILE or :PROFILE is null) and (CON_ID=:CON_ID or :CON_ID is 
 order by profile, resource_type, resource_name, CON_ID]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[ObjectPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3371,14 +3391,6 @@ order by profile, resource_type, resource_name, CON_ID]]></sql>
 from DBA_TAB_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, owner, table_name, privilege]]></sql>
-				<binds>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select * 
@@ -3387,7 +3399,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, owner, table_name, privilege, con_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[SystemPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3400,14 +3412,6 @@ order by grantee, owner, table_name, privilege, con_id]]></sql>
 from DBA_SYS_PRIVS
 where grantee=:USERNAME or :USERNAME is null
 order by grantee, privilege]]></sql>
-				<binds>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select * 
@@ -3416,7 +3420,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, privilege, con_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Roles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3437,7 +3441,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, granted_role, con_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[All Privileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3477,20 +3481,6 @@ from
   )
 start with grantee is null
 connect by grantee = prior granted_role]]></sql>
-				<binds>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CON_ID">
-						<prompt><![CDATA[CON_ID]]></prompt>
-						<tooltip><![CDATA[CON_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select
@@ -3522,7 +3512,7 @@ start with grantee is null
 connect by grantee = prior granted_role]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[UserObjects]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3543,20 +3533,6 @@ connect by grantee = prior granted_role]]></sql>
 from CDB_OBJECTS o
 where (con_id=:CON_ID or :CON_ID is null) and owner=:USERNAME
 order by owner, object_name, object_id]]></sql>
-				<binds>
-					<bind id="CON_ID">
-						<prompt><![CDATA[CON_ID]]></prompt>
-						<tooltip><![CDATA[CON_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select 
@@ -3573,7 +3549,7 @@ where owner=:USERNAME
 order by owner, object_name, object_id]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[UserSegments]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3593,20 +3569,6 @@ order by owner, object_name, object_id]]></sql>
 from CDB_SEGMENTS s
 where (con_id=:CON_ID or :CON_ID is null) and owner=:USERNAME
 order by owner, SEGMENT_name--, object_id]]></sql>
-				<binds>
-					<bind id="CON_ID">
-						<prompt><![CDATA[CON_ID]]></prompt>
-						<tooltip><![CDATA[CON_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="USERNAME">
-						<prompt><![CDATA[USERNAME]]></prompt>
-						<tooltip><![CDATA[USERNAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
 			</query>
 			<query>
 				<sql><![CDATA[select 'SQLDEV:LINK:'
@@ -6008,7 +5970,17 @@ order by con_id, owner, segment_name, partition_name]]></sql>
 			<TYPE><![CDATA[horizontal]]></TYPE>
 		</CustomValues>
 		<query>
-			<sql><![CDATA[SELECT 
+			<sql><![CDATA[select 
+  round(used_blocks/total_blocks,2) as percent_use,
+  'SQLDEV:GAUGE:0:100:0:0:'||round(used_blocks/total_blocks,2)  as PERC_USE,
+  ss.*,
+  'alter database default temporary tablespace '||tablespace_name||';' set_as_default
+  /*inst_id, tablespace_name, segment_file, total_blocks,
+        used_blocks, free_blocks, max_used_blocks, max_sort_blocks */
+from gv$sort_segment ss
+
+/*
+SELECT 
    a.inst_id,
    a.con_id,
    A.tablespace_name tablespace, 
@@ -6045,9 +6017,9 @@ GROUP by
   a.inst_id,
   a.con_id,
    A.tablespace_name, 
-   D.mb_total]]></sql>
+   D.mb_total */]]></sql>
 		</query>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[Sessions]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -6056,7 +6028,46 @@ GROUP by
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
 			<query>
-				<sql><![CDATA[SELECT b.tablespace,
+				<sql><![CDATA[SELECT
+i.instance_name instance_name
+, t.tablespace tablespace_name
+, s.sid sid
+, s.serial# serial_id
+, s.status session_status
+, s.username oracle_username
+, s.osuser os_username
+, p.spid os_pid
+, s.program session_program
+, s.sql_id
+, t.contents contents
+, t.segtype segtype
+, t.extents 
+, t.blocks
+, (t.blocks * c.value) bytes
+, a.sql_text
+, 'ALTER SYSTEM KILL SESSION '''||s.sid||','|| s.serial#||', @'||s.inst_id||''' IMMEDIATE;' as kill_stmt
+FROM
+gv$instance i
+, gv$session s
+, gv$process p
+, gv$sort_usage t
+, v$sqlarea a
+, (select value from v$parameter
+where name = 'db_block_size') c
+WHERE
+s.inst_id = p.inst_id
+AND p.inst_id = i.inst_id
+AND t.inst_id = i.inst_id
+AND s.inst_id = i.inst_id
+AND s.saddr = t.session_addr
+AND s.paddr = p.addr
+AND a.address=s.sql_address
+and a.hash_value=s.sql_hash_value
+ORDER BY
+(t.blocks * c.value) desc
+
+/*
+SELECT b.tablespace,
        ROUND(((b.blocks*p.value)/1024/1024),2)||'M' AS temp_size,
        a.inst_id as Instance,
        a.sid||','||a.serial# AS sid_serial,
@@ -6071,10 +6082,11 @@ WHERE  p.name  = 'db_block_size'
 AND    a.saddr = b.session_addr
 AND    a.inst_id=b.inst_id
 AND    a.inst_id=p.inst_id
-ORDER BY b.tablespace, b.blocks]]></sql>
+ORDER BY b.tablespace, b.blocks
+*/]]></sql>
 			</query>
 		</display>
-		<display id="" type="" style="Table" enable="true">
+		<display id="null" type="" style="Table" enable="true">
 			<name><![CDATA[TempFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -6086,6 +6098,44 @@ ORDER BY b.tablespace, b.blocks]]></sql>
 				<sql><![CDATA[select * 
 from cdb_temp_files
 order by con_id,file_id]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[ gv$temp_extent_pool]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select tep.* /*,inst_id, tablespace_name, blocks_cached, blocks_used */
+from gv$temp_extent_pool tep]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[gv$temp_space_header]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select tsh.* /*, inst_id,tablespace_name, blocks_used, blocks_free */
+from gv$temp_space_header tsh]]></sql>
+			</query>
+		</display>
+		<display id="null" type="" style="Table" enable="true">
+			<name><![CDATA[DATABASE_PROPERTIES]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT property_name,property_value FROM DATABASE_PROPERTIES where PROPERTY_NAME like '%TEMP%']]></sql>
 			</query>
 		</display>
 	</display>
