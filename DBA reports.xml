@@ -297,6 +297,26 @@ from CDB_SCHEDULER_JOB_LOG
 where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
   and (CON_ID=:CON_ID)
 order by LOG_ID desc --,LOG_DATE desc]]></sql>
+				<binds>
+					<bind id="OWNER">
+						<prompt><![CDATA[OWNER]]></prompt>
+						<tooltip><![CDATA[OWNER]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="JOB_NAME">
+						<prompt><![CDATA[JOB_NAME]]></prompt>
+						<tooltip><![CDATA[JOB_NAME]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="CON_ID">
+						<prompt><![CDATA[CON_ID]]></prompt>
+						<tooltip><![CDATA[CON_ID]]></tooltip>
+						<value><![CDATA[NULL_VALUE]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
 			</query>
 		</display>
 		<display id="" type="" style="Table" enable="true">
@@ -850,7 +870,7 @@ union all
 select NULL "FRA", 'Unused', ROUND((space_limit - space_used)/1024/1024/1024, 2)
   from v$recovery_file_dest def]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[FRA Summary]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -870,7 +890,7 @@ number_of_files as "Number of files",
 from V$RECOVERY_FILE_DEST]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[FRA Usage]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -884,7 +904,7 @@ from v$flash_recovery_area_usage
 order by percent_space_used desc]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[FRA Parameters]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -1660,9 +1680,9 @@ order by 1]]></sql>
 				<sql><![CDATA[select 'alter database datafile ''' || file_name || ''' resize ' ||
        ceil((nvl(hwm, 1) * c.block_size) / 1024 / 1024) || 'm;' cmd, 
        (a.bytes) / 1024 / 1024  current_size_MB,
-       'SQLDEV:GAUGE:0:'||a.bytes||':0:0:'||(nvl(hwm, 1) * c.block_size)  as current_and_resized,
+       'SQLDEV:GAUGE:0:100:0:0:'||((nvl(hwm, 1) * c.block_size)/a.bytes)*100  as current_and_resized,
        d.free_bytes/1024/1024 feee_space_MB,
-       'SQLDEV:GAUGE:0:'||a.bytes||':0:0:'||d.free_bytes as current_and_free_space,
+       'SQLDEV:GAUGE:0:100:0:0:'||(d.free_bytes/a.bytes)*100 as current_and_free_space,
        a.maxbytes/1024/1024 max_size_MB,
        autoextensible,
        a.file_id,
@@ -3307,6 +3327,20 @@ order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
 				</query>
 			</display>
 		</display>
+		<display id="4c19784a-019c-1000-8006-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[RAC Differing Parameters]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[WITH DiffParamsSet AS (select distinct name From gv$parameter group by name, value having count(*) =1)
+SELECT name, inst_id, value FROM gv$PARAMETER where name in (SELECT name from DiffParamsSet)
+order by name, inst_id]]></sql>
+			</query>
+		</display>
 	</folder>
 	<display id="36acad05-018d-1000-800f-ac19014670d5" type="" style="Table" enable="true">
 		<name><![CDATA[Users]]></name>
@@ -3336,7 +3370,7 @@ u.*,
 from cdb_users u
 order by username, con_id]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[UserProfile]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3365,7 +3399,7 @@ where ((profile=:PROFILE or :PROFILE is null) and (CON_ID=:CON_ID or :CON_ID is 
 order by profile, resource_type, resource_name, CON_ID]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[ObjectPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3386,7 +3420,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, owner, table_name, privilege, con_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[SystemPrivileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3407,7 +3441,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, privilege, con_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Roles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3428,7 +3462,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, granted_role, con_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[All Privileges]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3499,7 +3533,7 @@ start with grantee is null
 connect by grantee = prior granted_role]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[UserObjects]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -3536,7 +3570,7 @@ where owner=:USERNAME
 order by owner, object_name, object_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[UserSegments]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -4238,6 +4272,20 @@ where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
 				</query>
 			</display>
 		</display>
+		<display id="4c3397df-019c-1000-804a-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Snapshots]]></name>
+			<description><![CDATA[					]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from perfstat.stats$snapshot
+order by snap_time desc]]></sql>
+			</query>
+<item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="76f2db8c-018f-1000-8012-ac1900c08aaa" toolbar="false" ><title>System Statistics from Statspac</title></item>		</display>
 	</folder>
 	<folder>
 		<name><![CDATA[AWR]]></name>
@@ -4545,6 +4593,737 @@ order by machine, start_session, session_id, session_serial#]]></sql>
 				</query>
 			</display>
 		</display>
+		<folder>
+			<name><![CDATA[AWR]]></name>
+			<tooltip><![CDATA[AWR]]></tooltip>
+			<description><![CDATA[ ]]></description>
+				<display id="4c1e20c8-019c-1000-8034-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[AWR - Performance Detail by Snap for 1 SQL_ID]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT 
+TO_CHAR(begin_interval_time,'MM/DD/YYYY HH24:MI')
+  || ' - '
+  || TO_CHAR(end_interval_time,'HH24:MI') AS INTERVAL_TEST,
+  sql_id as SQLID,
+  plan_hash_value                                        AS "PlanHashValue",
+  ROUND(elapsed_time_total/1000000,2)                    AS "ElapsedTotal",
+  executions_total                                       AS "ExecsTotal",
+  px_servers_execs_total AS "PXServers",
+  ROUND((elapsed_time_total/1000000)/executions_total,4) AS "ElapsedPerExec" ,
+  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER as INST_NUM, 
+  dba_hist_sqlstat.*
+FROM dba_hist_sqlstat
+JOIN dba_hist_snapshot
+ON dba_hist_sqlstat.snap_id=dba_hist_snapshot.snap_id
+  and dba_hist_sqlstat.instance_number=dba_hist_snapshot.instance_number
+WHERE sql_id              IN (TRIM(:sql_id))
+AND executions_total       > 0
+ORDER BY DBA_HIST_SNAPSHOT.end_interval_time DESC,
+  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER]]></sql>
+					<binds>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<value><![CDATA[az33m61ym46y4]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="4c1e20c8-019c-1000-8035-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[AWR - Performance Summary By Day for 1 SQL_ID]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select TO_CHAR(TRUNC(end_interval_time),'MM/DD/YYYY HH24:MI') as Day,  
+       SQL_ID, 
+       PLAN_HASH_VALUE,
+       ROUND(SUM(elapsed_time_total/1000000),2) as "Total Elapsed",
+       sum(executions_total) as "TotalExecs",
+       ROUND(SUM(elapsed_time_total/1000000)/SUM(executions_total),2) as "AvgTimePerExec",
+       ROUND(MIN(elapsed_time_total/1000000/executions_total),2) as "MinHourlyAvgElapsed",
+       ROUND(MAX(elapsed_time_total/1000000/executions_total),2) as "MaxHourlyAvgElapsed"
+from dba_hist_sqlstat join dba_hist_snapshot on dba_hist_sqlstat.snap_id=dba_hist_snapshot.snap_id  
+where sql_id IN (:sql_id) and executions_total > 0
+GROUP BY TRUNC(end_interval_time), SQL_ID, PLAN_HASH_VALUE
+ORDER BY 1 DESC]]></sql>
+					<binds>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<value><![CDATA[08gcxd2g850vm]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="4c1e20c8-019c-1000-8036-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[AWR - Longest Running User SQL - Last n Days]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT
+    *
+FROM
+    (
+        SELECT
+            elap_per_exec,
+            executions_total AS exec_cnt,
+            total_seconds,
+            TO_CHAR(begin_interval_time,'MM-DD-YYYY HH24:MI')
+             ||  '-'
+             ||  TO_CHAR(end_interval_time,'HH24:MI') period,
+            parsing_schema_name AS username,
+            sql_id,
+            plan_hash_value,
+            sql_text
+        FROM
+            (
+                WITH snap AS (
+                    SELECT
+    /*+ MATERIALIZE */
+                        snap_id,
+                        begin_interval_time,
+                        end_interval_time
+                    FROM
+                        dba_hist_snapshot
+                    WHERE
+                        end_interval_time > ( SYSDATE - :previous_days )
+                ),sql AS (
+                    SELECT /*+ MATERIALIZE */
+                        *
+                    FROM
+                        dba_hist_sqlstat
+                    WHERE
+                        executions_total > 0
+                ) SELECT
+                    round(elapsed_time_total / 1000000 / executions_total,2) AS elap_per_exec,
+                    sql.sql_id,
+                    sql.plan_hash_value,
+                    parsing_schema_name,
+                    executions_total,
+                    round(elapsed_time_total / 1000000,2) AS total_seconds,
+                    sql_text,
+                    begin_interval_time,
+                    end_interval_time
+                FROM
+                    snap
+                    JOIN
+                        sql
+                    ON
+                        snap.snap_id = sql.snap_id
+                    JOIN
+                        dba_hist_sqltext
+                    ON
+                        sql.sql_id = dba_hist_sqltext.sql_id
+            )
+        ORDER BY
+            elap_per_exec DESC
+    )
+WHERE
+    ROWNUM <= 5000
+    AND USERNAME NOT IN ('SYS','SYSTEM','DBSNMP','DII','AUDSYS')]]></sql>
+					<binds>
+						<bind id="previous_days">
+							<prompt><![CDATA[previous_days]]></prompt>
+							<tooltip><![CDATA[previous_days]]></tooltip>
+							<value><![CDATA[20]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="4c1e20c9-019c-1000-8037-a9fe632cd7a4" type="" style="Script" enable="true">
+				<name><![CDATA[AWR Reports By Snap - Detail as Text]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT 
+   output  
+FROM    
+   TABLE
+   (dbms_workload_repository.awr_report_text 
+      (:DBID,:INSTANCE_NUMBER,:SNAP_ID,:SNAP_ID+1 )
+   )]]></sql>
+					<binds>
+						<bind id="DBID">
+							<prompt><![CDATA[DBID]]></prompt>
+							<tooltip><![CDATA[DBID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="INSTANCE_NUMBER">
+							<prompt><![CDATA[INSTANCE_NUMBER]]></prompt>
+							<tooltip><![CDATA[INSTANCE_NUMBER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="SNAP_ID">
+							<prompt><![CDATA[SNAP_ID]]></prompt>
+							<tooltip><![CDATA[SNAP_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="4c1e20c9-019c-1000-8038-a9fe632cd7a4" type="" style="plsql-dbms_output" enable="true">
+				<name><![CDATA[Last 24 Hours AWR Report]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[declare
+dbid number;
+instance_id number;
+start_id number;
+end_id number;
+begin
+dbms_output.enable(1000000);
+select max(snap_id)-24,max(snap_id) into start_id,end_id from dba_hist_snapshot;
+select dbid into dbid from v$database;
+select instance_number into instance_id from v$instance;
+
+dbms_output.put_line('<PRE>');
+for rc in ( select output from 
+   table(dbms_workload_repository.awr_report_text(dbid,instance_id,start_id,end_id)) 
+           ) loop
+  -- dbms_output.put_line('<BR>');
+   dbms_output.put_line(rc.output);
+end loop;
+dbms_output.put_line('</PRE>');
+end;]]></sql>
+				</query>
+			</display>
+			<display id="4c1e20c9-019c-1000-8039-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[AWR SQL Plan From History]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT
+     RPAD('(' || p.ID || ' ' || NVL(p.parent_id,'0') || ')',8) || '|' ||
+     RPAD(LPAD (' ', 2*p.DEPTH) || p.operation || ' ' || p.options,80,'.') ||
+     NVL2(p.object_owner||p.object_name, '(' || p.object_owner|| '.' || p.object_name || ') ', '') ||
+     'Cost:' || p.COST || ' ' || NVL2(p.bytes||p.CARDINALITY,'(' || p.bytes || ' bytes, ' || p.CARDINALITY || ' rows)','') || ' ' ||
+     NVL2(p.partition_id || p.partition_start || p.partition_stop,'PId:' || p.partition_id || ' PStart:' ||
+     p.partition_start || ' PStop:' || p.partition_stop,'') ||
+     'io cost=' || p.io_cost || ',cpu_cost=' || p.cpu_cost AS PLAN
+     FROM dba_hist_sql_plan p
+     WHERE p.sql_id=:SQL_ID
+     AND plan_hash_value=:PLAN_HASH_VALUE
+     ORDER BY p.id, p.parent_id]]></sql>
+				</query>
+			</display>
+			<display id="4c1e20c9-019c-1000-803a-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[AWR Perf Detail By Snap - RAC Comparison]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT 
+TO_CHAR(begin_interval_time,'MM/DD/YYYY HH24:MI')
+  || ' - '
+  || TO_CHAR(end_interval_time,'HH24:MI') AS INTERVAL_TEST,
+  sql_id as SQLID,
+  plan_hash_value                                        AS "PlanHashValue",
+  ROUND(elapsed_time_total/1000000,2)                    AS "ElapsedTotal",
+  executions_total                                       AS "ExecsTotal",
+  px_servers_execs_total AS "PXServers",
+  ROUND((elapsed_time_total/1000000)/executions_total,2) AS "ElapsedPerExec" ,
+  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER as INST_NUM, 
+  dba_hist_sqlstat.*
+FROM dba_hist_sqlstat
+JOIN dba_hist_snapshot
+ON dba_hist_sqlstat.snap_id=dba_hist_snapshot.snap_id
+  and dba_hist_sqlstat.instance_number=dba_hist_snapshot.instance_number
+WHERE sql_id              IN (TRIM(:sql_id))
+AND executions_total       > 0
+ORDER BY INST_NUM, DBA_HIST_SNAPSHOT.end_interval_time DESC,
+  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER]]></sql>
+					<binds>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<tooltip><![CDATA[sql_id]]></tooltip>
+							<value><![CDATA[0h6zwrx2qhjh2]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="4c1e20c9-019c-1000-803b-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[AWR Plan Usage Summary for 1 SQL_ID]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[WITH
+p AS (
+SELECT plan_hash_value
+  FROM gv$sql_plan
+ WHERE sql_id = TRIM(:sql_id)
+   AND other_xml IS NOT NULL
+ UNION
+SELECT plan_hash_value
+  FROM dba_hist_sql_plan
+ WHERE sql_id = TRIM(:sql_id)
+   AND other_xml IS NOT NULL ),
+m AS (
+SELECT plan_hash_value,
+       SUM(elapsed_time)/SUM(executions) avg_et_secs
+  FROM gv$sql
+ WHERE sql_id = TRIM(:sql_id)
+   AND executions > 0
+ GROUP BY
+       plan_hash_value ),
+a AS (
+SELECT plan_hash_value,
+       SUM(elapsed_time_total)/SUM(executions_total) avg_et_secs,
+       count(*) as CNT,
+MIN(SNAP_ID) as MIN_SNAP_ID,
+MAX(SNAP_ID) as MAX_SNAP_ID
+  FROM dba_hist_sqlstat
+ WHERE sql_id = TRIM(:sql_id)
+   AND executions_total > 0
+ GROUP BY
+       plan_hash_value )
+SELECT p.plan_hash_value,
+       ROUND(NVL(m.avg_et_secs, a.avg_et_secs)/1e6, 3) avg_et_secs,
+       CNT, 
+       MIN_SNAP_ID, 
+       (SELECT TO_CHAR(MAX(END_INTERVAL_TIME),'MM-DD-YYYY') FROM DBA_HIST_SNAPSHOT WHERE SNAP_ID=MIN_SNAP_ID) as MIN_SNAP_END_TIME,
+       MAX_SNAP_ID,
+       (SELECT TO_CHAR(MAX(END_INTERVAL_TIME),'MM-DD-YYYY') FROM DBA_HIST_SNAPSHOT WHERE SNAP_ID=MAX_SNAP_ID) as MAX_SNAP_END_TIME
+  FROM p, m, a
+ WHERE p.plan_hash_value = m.plan_hash_value(+)
+   AND p.plan_hash_value = a.plan_hash_value(+)
+ ORDER BY
+       avg_et_secs NULLS LAST]]></sql>
+					<binds>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<tooltip><![CDATA[sql_id]]></tooltip>
+							<value><![CDATA[1f74gfyy42n7m]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<folder>
+				<name><![CDATA[Statement Performance]]></name>
+				<tooltip><![CDATA[Statement Performance]]></tooltip>
+				<description><![CDATA[ ]]></description>
+					<display id="4c1e20c9-019c-1000-803c-a9fe632cd7a4" type="" style="plsql-dbms_output" enable="true">
+					<name><![CDATA[Execution Plan Color Map v1]]></name>
+					<description><![CDATA[Show summary of plan usage for each AWR period to view performance trends and identify good/bad plans.  
+
+This report searches all availabel AWR history for 1 SQL_ID. ]]></description>
+					<tooltip><![CDATA[]]></tooltip>
+					<drillclass><![CDATA[]]></drillclass>
+					<CustomValues>
+					</CustomValues>
+					<query>
+						<sql><![CDATA[DECLARE
+  -- David Mann
+  -- http://ba6.us
+  -- This code is from http://ba6.us/5_in_5_No_1
+  --
+  -- History:
+  -- 2014-09-24 DMann Initial release of v1
+
+  maxAvgElapsedPerExec NUMBER;
+  maxExecCount NUMBER;
+  maxTotalElapsedPerPeriod NUMBER;
+
+  sqlid VARCHAR2(15) := ''||:statement_sql_id;
+  
+  dbname VARCHAR2(20);
+
+  FUNCTION dec2hex (N in number) RETURN varchar2 IS
+  hexval varchar2(64);
+  N2     number := N;
+  digit  number;
+  hexdigit  char;
+BEGIN
+  while ( N2 > 0 ) loop
+     digit := mod(N2, 16);
+     if digit > 9 then 
+       hexdigit := chr(ascii('A') + digit - 10);
+     else
+       hexdigit := to_char(digit);
+     end if;
+     hexval := hexdigit || hexval;
+     N2 := trunc( N2 / 16 );
+  end loop;
+  return hexval;
+END dec2hex;
+
+FUNCTION ColorHash (plan_hash_value in number) return varchar2 IS
+  retval VARCHAR2(6);
+BEGIN
+  retval := SUBSTR(dec2hex(substr(plan_hash_value,1,3)),1,2);
+  retval := retval || SUBSTR(dec2hex(substr(plan_hash_value,4,3)),1,2);
+  retval := retval || SUBSTR(dec2hex(substr(plan_hash_value,7,3)),1,2);
+
+return retval;
+END;
+
+BEGIN
+  dbms_output.enable(100000000);
+
+  -- Find upper bounds 
+  SELECT MAX((elapsed_time_total/1000000)/executions_total) as MAX_AVG_ELAPSED_PER_EXEC, 
+         MAX(executions_total) AS MAX_EXECUTION_COUNT,
+         MAX(elapsed_time_total) as MAX_TOTAL_ELAPSED_PER_PERIOD
+    INTO maxAvgElapsedPerExec, maxExecCount, maxTotalElapsedPerPeriod
+  FROM dba_hist_sqlstat
+  JOIN dba_hist_snapshot
+  ON dba_hist_sqlstat.snap_id=dba_hist_snapshot.snap_id
+    and dba_hist_sqlstat.instance_number=dba_hist_snapshot.instance_number
+  WHERE sql_id              IN (TRIM(sqlid))
+  AND executions_total       > 0;
+
+  -- Main table
+  select name into dbname from v$database;
+  DBMS_OUTPUT.PUT_LINE('<H1>Execution Plan Color Map for '|| sqlid ||'@'|| dbname ||'</H1>');
+
+  DBMS_OUTPUT.PUT_LINE('<TABLE BORDER="0" BGCOLOR="#EEEEEE" WIDTH="100%">');
+  -- Header
+  DBMS_OUTPUT.PUT_LINE('<TR>');
+  DBMS_OUTPUT.PUT_LINE('<TD WIDTH="8%">Time Period</TD>');
+--  DBMS_OUTPUT.PUT_LINE('<TD WIDTH="8%">Count (Max '||maxExecCount||') :</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD WIDTH="8%">Total Elapsed Time Per Period (Max '||ROUND(maxTotalElapsedPerPeriod)||'s) :</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD WIDTH="76%">Avg Time Per Exec (Max '||ROUND(maxAvgElapsedPerExec)||'s) :</TD>');
+  DBMS_OUTPUT.PUT_LINE('</TR>');
+
+  FOR cur IN (
+    SELECT end_interval_time,
+           sql_id,
+           plan_hash_value,
+           ROUND(elapsed_time_total/1000000,2)                    AS "ElapsedTotal",
+           executions_total,
+           --px_servers_execs_total AS "PXServers",
+           ROUND((elapsed_time_total/1000000)/executions_total,2) AS ElapsedPerExec,
+           elapsed_time_total
+           --DBA_HIST_SNAPSHOT.INSTANCE_NUMBER as INST_NUM, 
+           --dba_hist_sqlstat.*
+      FROM dba_hist_sqlstat
+      JOIN dba_hist_snapshot
+        ON dba_hist_sqlstat.snap_id=dba_hist_snapshot.snap_id
+           AND dba_hist_sqlstat.instance_number=dba_hist_snapshot.instance_number
+     WHERE sql_id              IN (TRIM(sqlid))
+       AND executions_total       > 0
+     ORDER BY DBA_HIST_SNAPSHOT.end_interval_time DESC,
+              DBA_HIST_SNAPSHOT.INSTANCE_NUMBER)
+  LOOP
+    
+    DBMS_OUTPUT.PUT_LINE('<TR>');
+
+    -- Date field contents
+    DBMS_OUTPUT.PUT_LINE('<TD><p style="font-size:10px">'||TO_CHAR(cur.END_INTERVAL_TIME,'YYYY-MM-DD HH24:MI')||'</P></TD>');
+    -- Count field contents
+    --DBMS_OUTPUT.PUT_LINE('<TD><p style="font-size:10px" align="RIGHT">'||
+    --  '<TABLE  cellpadding=0 BORDER="0" BGCOLOR="#000000" WIDTH="'||ROUND(cur.executions_total/maxExecCount*100)||
+    --  '%"><TR><TD></TD></TR></TABLE>'||'</TD>');
+    -- Total Time
+    DBMS_OUTPUT.PUT_LINE('<TD><p style="font-size:10px" align="RIGHT">'||
+      '<TABLE  cellpadding=0 BORDER="0" BGCOLOR="#000000" WIDTH="'||ROUND(cur.elapsed_time_total/maxTotalElapsedPerPeriod*100)||
+      '%"><TR><TD></TD></TR></TABLE>'||'</TD>');
+
+    -- Time/Plan field contents
+    DBMS_OUTPUT.PUT_LINE('<TD><p style="font-size:10px">'||
+      '<TABLE  cellpadding=0 BORDER="0" BGCOLOR="#'||
+      ColorHash(cur.plan_hash_value)||'" WIDTH="'||
+      ROUND(cur.ElapsedPerExec/maxAvgElapsedPerExec*100)||'%">'||
+      cur.plan_hash_value||'-'||ROUND(cur.ElapsedPerExec)||'s</P></TD>'||
+      '</TR></TABLE></TD>');
+
+    -- Seconds Info
+    DBMS_OUTPUT.PUT_LINE('<TD>'||ROUND(cur.ElapsedPerExec)||'s</TD>');
+
+    DBMS_OUTPUT.PUT_LINE('</TR>');
+    
+  END LOOP;
+
+  DBMS_OUTPUT.PUT_LINE('</TABLE>');
+  DBMS_OUTPUT.PUT_LINE('<H1>Execution Plan Color Map for '|| sqlid ||'@'|| dbname ||'</H1>');
+
+END;]]></sql>
+						<binds>
+							<bind id="statement_sql_id">
+								<prompt><![CDATA[statement_sql_id]]></prompt>
+								<tooltip><![CDATA[statement_sql_id]]></tooltip>
+								<value><![CDATA[2k55m9jcn5q37]]></value>
+								<bracket><![CDATA[null]]></bracket>
+							</bind>
+						</binds>
+					</query>
+				</display>
+				<display id="4c1e20c9-019c-1000-803d-a9fe632cd7a4" type="" style="Table" enable="true">
+					<name><![CDATA[Execution Plan Volatility]]></name>
+					<description><![CDATA[For all AWR History available, find SQL statements that have used more than 1 PLAN_HASH_VALUE. 
+
+History:
+11-19-2014 DMANN - Added SQL Text]]></description>
+					<tooltip><![CDATA[]]></tooltip>
+					<drillclass><![CDATA[]]></drillclass>
+					<CustomValues>
+						<TYPE><![CDATA[horizontal]]></TYPE>
+					</CustomValues>
+					<query>
+						<sql><![CDATA[WITH STMTS AS (
+select sql_id, count(*) AS CNT 
+from (
+select distinct sql_id, plan_hash_value from dba_hist_sqlstat)
+group by sql_id
+HAVING COUNT(*) > 1
+ORDER BY 2 DESC)
+SELECT STMTS.*,DBA_HIST_SQLTEXT.SQL_TEXT 
+FROM STMTS LEFT OUTER JOIN DBA_HIST_SQLTEXT 
+  ON STMTS.SQL_ID=DBA_HIST_SQLTEXT.SQL_ID
+  ORDER BY CNT DESC]]></sql>
+					</query>
+				</display>
+			</folder>
+			<display id="4c1e20c9-019c-1000-803e-a9fe632cd7a4" type="" style="Chart" enable="true">
+				<name><![CDATA[AWR - Performance Detail by Snap for 1 SQL_ID - Graph by Exec Time]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+					<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+					<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+					<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+					<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+					<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+					<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+					<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+					<Y1AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y1AXIS_SCALE_MAXIMUM>
+					<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+					<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+					<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+					<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+					<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+					<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+					<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+					<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+					<GRID><![CDATA[true]]></GRID>
+					<STYLE><![CDATA[Default]]></STYLE>
+					<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+					<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+					<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+					<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+					<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+					<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+					<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+					<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+					<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM (
+SELECT 
+--TO_CHAR(begin_interval_time,'MM/DD/YYYY HH24:MI')
+--  || ' - '
+--  || TO_CHAR(end_interval_time,'HH24:MI') AS INTERVAL_TEST,
+-- Y Axis
+begin_interval_time, 
+-- Legend
+'Elapsed Per Exec - '||SQL_ID AS Legend,
+-- X Axis
+  ROUND((elapsed_time_total/1000000)/executions_total,2) AS ELAPSED_PER_EXEC 
+
+
+--  plan_hash_value                                        AS "PlanHashValue",
+--  ROUND(elapsed_time_total/1000000,2)                    AS "ElapsedTotal",
+--  executions_total                                       AS "ExecsTotal",
+--  px_servers_execs_total AS "PXServers",
+--  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER as INST_NUM, 
+--  dba_hist_sqlstat.*
+FROM dba_hist_sqlstat
+JOIN dba_hist_snapshot
+ON dba_hist_sqlstat.snap_id=dba_hist_snapshot.snap_id
+  and dba_hist_sqlstat.instance_number=dba_hist_snapshot.instance_number
+WHERE sql_id              IN (TRIM(:sql_id))
+AND executions_total       > 0
+ORDER BY DBA_HIST_SNAPSHOT.end_interval_time DESC,
+  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER ASC)
+  WHERE ROWNUM < 1000
+  ORDER BY begin_interval_time]]></sql>
+					<binds>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<tooltip><![CDATA[sql_id]]></tooltip>
+							<value><![CDATA[08gcxd2g850vm]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<folder>
+				<name><![CDATA[AWR Report]]></name>
+				<tooltip><![CDATA[AWR Report]]></tooltip>
+				<description><![CDATA[ ]]></description>
+					<display id="4c1e20c9-019c-1000-803f-a9fe632cd7a4" type="" style="Table" enable="true">
+					<name><![CDATA[AWR Reports By Snap - Main]]></name>
+					<description><![CDATA[]]></description>
+					<tooltip><![CDATA[]]></tooltip>
+					<drillclass><![CDATA[]]></drillclass>
+					<CustomValues>
+						<TYPE><![CDATA[horizontal]]></TYPE>
+					</CustomValues>
+					<query>
+						<sql><![CDATA[-- Child report:
+-- http://www.thatjeffsmith.com/archive/2012/01/sweet-child-report-o-mine/
+SELECT SNAP_ID, 
+       INSTANCE_NUMBER, 
+       TO_CHAR(BEGIN_INTERVAL_TIME,'YYYY-MM-DD HH24:MI') as BEGIN_TIME, 
+       EXTRACT( HOUR FROM (END_INTERVAL_TIME-BEGIN_INTERVAL_TIME))*60+
+       EXTRACT( MINUTE FROM (END_INTERVAL_TIME-BEGIN_INTERVAL_TIME)) AS MINUTES,
+       DBID
+FROM dba_hist_snapshot ORDER BY 
+SNAP_ID DESC, INSTANCE_NUMBER ASC;]]></sql>
+					</query>
+<item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="792de96c-0138-1000-803a-0a01571c53e9" toolbar="false" ><title>Generate AWR as Text</title><sql><![CDATA[]]></sql><script language="js"><![CDATA[]]></script><help></help></item><item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="7936a819-0138-1000-804e-0a01571c53e9" toolbar="false" ><title>Generate AWR as HTML</title><sql><![CDATA[]]></sql><script language="js"><![CDATA[]]></script><help></help></item>				</display>
+				<display id="4c1e20c9-019c-1000-8040-a9fe632cd7a4" type="" style="plsql-dbms_output" enable="true">
+					<name><![CDATA[AWR Reports By Snap - Detail as HTML]]></name>
+					<description><![CDATA[]]></description>
+					<tooltip><![CDATA[]]></tooltip>
+					<drillclass><![CDATA[]]></drillclass>
+					<CustomValues>
+					</CustomValues>
+					<query>
+						<sql><![CDATA[SELECT 
+   output  
+FROM    
+   TABLE
+   (dbms_workload_repository.awr_report_html 
+      (:DBID,:INSTANCE_NUMBER,:SNAP_ID,:SNAP_ID+1 )
+   )]]></sql>
+						<binds>
+							<bind id="DBID">
+								<prompt><![CDATA[DBID]]></prompt>
+								<tooltip><![CDATA[DBID]]></tooltip>
+								<value><![CDATA[NULL_VALUE]]></value>
+								<bracket><![CDATA[null]]></bracket>
+							</bind>
+							<bind id="INSTANCE_NUMBER">
+								<prompt><![CDATA[INSTANCE_NUMBER]]></prompt>
+								<tooltip><![CDATA[INSTANCE_NUMBER]]></tooltip>
+								<value><![CDATA[NULL_VALUE]]></value>
+								<bracket><![CDATA[null]]></bracket>
+							</bind>
+							<bind id="SNAP_ID">
+								<prompt><![CDATA[SNAP_ID]]></prompt>
+								<tooltip><![CDATA[SNAP_ID]]></tooltip>
+								<value><![CDATA[NULL_VALUE]]></value>
+								<bracket><![CDATA[null]]></bracket>
+							</bind>
+						</binds>
+					</query>
+				</display>
+			</folder>
+			<display id="4c1e20c9-019c-1000-8041-a9fe632cd7a4" type="" style="Chart" enable="true">
+				<name><![CDATA[AWR - Performance Detail by Snap for 1 SQL_ID - Graph by Count]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+					<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+					<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+					<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+					<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+					<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+					<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+					<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+					<Y1AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y1AXIS_SCALE_MAXIMUM>
+					<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+					<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+					<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+					<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+					<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+					<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+					<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+					<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+					<GRID><![CDATA[true]]></GRID>
+					<STYLE><![CDATA[Default]]></STYLE>
+					<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+					<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+					<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+					<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+					<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+					<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+					<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+					<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+					<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM (
+SELECT 
+--TO_CHAR(begin_interval_time,'MM/DD/YYYY HH24:MI')
+--  || ' - '
+--  || TO_CHAR(end_interval_time,'HH24:MI') AS INTERVAL_TEST,
+-- Y Axis
+begin_interval_time, 
+-- Legend
+'Executions per AWR Period - '||SQL_ID AS Legend,
+-- X Axis
+--  ROUND((elapsed_time_total/1000000)/executions_total,2) AS ELAPSED_PER_EXEC 
+
+--  plan_hash_value                                        AS "PlanHashValue",
+--  ROUND(elapsed_time_total/1000000,2)                    AS "ElapsedTotal",
+  executions_total                                       AS "ExecsTotal"
+--  px_servers_execs_total AS "PXServers",
+--  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER as INST_NUM, 
+--  dba_hist_sqlstat.*
+FROM dba_hist_sqlstat
+JOIN dba_hist_snapshot
+ON dba_hist_sqlstat.snap_id=dba_hist_snapshot.snap_id
+  and dba_hist_sqlstat.instance_number=dba_hist_snapshot.instance_number
+WHERE sql_id              IN (TRIM(:sql_id))
+AND executions_total       > 0
+ORDER BY DBA_HIST_SNAPSHOT.end_interval_time DESC,
+  DBA_HIST_SNAPSHOT.INSTANCE_NUMBER ASC)
+  WHERE ROWNUM < 1000
+  ORDER BY begin_interval_time]]></sql>
+					<binds>
+						<bind id="sql_id">
+							<prompt><![CDATA[sql_id]]></prompt>
+							<tooltip><![CDATA[sql_id]]></tooltip>
+							<value><![CDATA[0w3x6zaf0865s]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+		</folder>
 	</folder>
 	<display id="76f252a5-018f-1000-8011-ac1900c08aaa" type="" style="Chart" enable="true">
 		<name><![CDATA[Undo - current usage]]></name>
@@ -4874,6 +5653,36 @@ ORDER BY total_wait_time DESC]]></sql>
 					</binds>
 				</query>
 			</display>
+		</display>
+		<display id="4c1fc240-019c-1000-8045-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Users Logged In During Time Period]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT user_id,
+       to_char(SAMPLE_TIME,'yyyy-mm-dd hh24:mi:ss')
+  from gv$active_session_history
+ where SAMPLE_TIME between to_date(:start_time, 'yyyy-mm-dd hh24:mi') 
+       and to_date(:end_time, 'yyyy-mm-dd hh24:mi')]]></sql>
+				<binds>
+					<bind id="start_time">
+						<prompt><![CDATA[start_time]]></prompt>
+						<tooltip><![CDATA[start_time]]></tooltip>
+						<value><![CDATA[2022-04-14 05:00]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+					<bind id="end_time">
+						<prompt><![CDATA[end_time]]></prompt>
+						<tooltip><![CDATA[end_time]]></tooltip>
+						<value><![CDATA[2015-04-14 06:00]]></value>
+						<bracket><![CDATA[null]]></bracket>
+					</bind>
+				</binds>
+			</query>
 		</display>
 	</folder>
 	<folder>
@@ -5363,6 +6172,14 @@ select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
    --and sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
    and sh.INST_ID = ( select INST_ID from V$INSTANCE )
    and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
+					<binds>
+						<bind id="TIME">
+							<prompt><![CDATA[TIME]]></prompt>
+							<tooltip><![CDATA[TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 		</display>
@@ -5460,7 +6277,7 @@ order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
 					<bind id="start_hours">
 						<prompt><![CDATA[start_hours]]></prompt>
 						<tooltip><![CDATA[start_hours]]></tooltip>
-						<value><![CDATA[30]]></value>
+						<value><![CDATA[90]]></value>
 						<bracket><![CDATA[null]]></bracket>
 					</bind>
 					<bind id="end_hours">
@@ -5515,8 +6332,135 @@ select distinct e.WAIT_CLASS, e.WAIT_CLASS_ID
    --and sh.METRIC_ID = 2075 -- "CPU Usage Per Sec" in csec/s
    and sh.INST_ID = ( select INST_ID from V$INSTANCE )
    and to_char( END_TIME, 'yyyy-mm-dd hh24:mi' ) = :TIME]]></sql>
+					<binds>
+						<bind id="TIME">
+							<prompt><![CDATA[TIME]]></prompt>
+							<tooltip><![CDATA[TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
+		</display>
+		<display id="4c22c8a8-019c-1000-8046-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Unindexed FKs]]></name>
+			<description><![CDATA[Foreign Keys with no supporting Index (includes parent AND child tables)
+See: https://docs.oracle.com/en/database/oracle/oracle-database/12.2/cncpt/data-concurrency-and-consistency.html#GUID-261F98F8-F7B4-49A9-9BE8-11F2B1F4609B]]></description>
+			<tooltip><![CDATA[Foreign Keys with no supporting Index (includes parent AND child tables)]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT "OWNER", 
+       'SQLDEV:LINK:'
+       ||owner
+       ||':TABLE:'
+       ||table_name
+       ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS "TABLE_NAME",
+       "CONSTRAINT_NAME", "STATUS", "CONSTRAINT_COLUMNS", "R_OWNER", "R_CONSTRAINT_NAME"
+FROM(
+WITH
+ref_int_constraints AS (
+SELECT /*+ MATERIALIZE NO_MERGE */
+       col.owner,
+       col.constraint_name,
+       col.table_name,
+       con.status,
+       con.r_owner,
+       con.r_constraint_name,
+       MAX(CASE col.position WHEN 01 THEN      col.column_name END)||
+       MAX(CASE col.position WHEN 02 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 03 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 04 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 05 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 06 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 07 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 08 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 09 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 10 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 11 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 12 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 13 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 14 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 15 THEN ':'||col.column_name END)||
+       MAX(CASE col.position WHEN 16 THEN ':'||col.column_name END)
+       constraint_columns
+  FROM dba_constraints  con,
+       dba_cons_columns col
+ WHERE con.constraint_type = 'R'
+   --AND con.status = 'ENABLED'
+   AND con.owner NOT IN ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','DIP','EXFSYS','FLOWS_FILES','GSMADMIN_INTERNAL','LBACSYS'
+                        ,'MDSYS','OLAPSYS','ORACLE_OCM','ORDDATA','ORDPLUGINS','ORDSYS','ORDS_METADATA','OUTLN','OWBSYS'
+                        ,'SI_INFORMTN_SCHEMA','SQLTXADMIN','SQLTXPLAIN','SYS','SYSMAN','SYSTEM','TRCANLZR','WMSYS','XDB','XS$NULL')
+   AND con.owner NOT LIKE ('APEX%')
+   AND col.owner = con.owner
+   AND col.constraint_name = con.constraint_name
+   AND col.table_name = con.table_name
+ GROUP BY
+       col.owner,
+       col.constraint_name,
+       col.table_name,
+       con.status,
+       con.r_owner,
+       con.r_constraint_name
+),
+indexed_columns AS (
+SELECT /*+ MATERIALIZE NO_MERGE */
+       col.index_owner,
+       col.index_name,
+       col.table_owner,
+       col.table_name,
+       MAX(CASE col.column_position WHEN 01 THEN      col.column_name END)||
+       MAX(CASE col.column_position WHEN 02 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 03 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 04 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 05 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 06 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 07 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 08 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 09 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 10 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 11 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 12 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 13 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 14 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 15 THEN ':'||col.column_name END)||
+       MAX(CASE col.column_position WHEN 16 THEN ':'||col.column_name END)
+       indexed_columns
+  FROM dba_ind_columns col
+ WHERE col.table_owner NOT IN ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','DIP','EXFSYS','FLOWS_FILES','GSMADMIN_INTERNAL','LBACSYS'
+                        ,'MDSYS','OLAPSYS','ORACLE_OCM','ORDDATA','ORDPLUGINS','ORDSYS','ORDS_METADATA','OUTLN','OWBSYS'
+                        ,'SI_INFORMTN_SCHEMA','SQLTXADMIN','SQLTXPLAIN','SYS','SYSMAN','SYSTEM','TRCANLZR','WMSYS','XDB','XS$NULL')
+   AND col.table_owner NOT LIKE ('APEX%')
+ GROUP BY
+       col.index_owner,
+       col.index_name,
+       col.table_owner,
+       col.table_name
+)
+SELECT /*+ NO_MERGE */
+       rc.status,
+       rc.owner,
+       rc.table_name,
+       rc.constraint_name,
+       rc.constraint_columns,
+       rc.r_owner,
+       rc.r_constraint_name
+  FROM ref_int_constraints rc,
+       indexed_columns     ic
+ WHERE ic.table_owner(+) = rc.owner
+   AND ic.table_name(+) = rc.table_name
+   AND ic.indexed_columns(+) LIKE rc.constraint_columns||'%'
+   AND ic.table_name IS NULL
+ ORDER BY
+       rc.status DESC,
+       rc.owner,
+       rc.table_name,
+       rc.constraint_name
+)]]></sql>
+			</query>
 		</display>
 	</folder>
 	<display id="31d156df-0196-1000-8003-ac190189ed75" type="" style="Table" enable="true">
@@ -5792,7 +6736,7 @@ order by con_id, owner, segment_name, partition_name]]></sql>
         used_blocks, free_blocks, max_used_blocks, max_sort_blocks */
 from gv$sort_segment ss]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Sessions]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5858,7 +6802,7 @@ AND    a.inst_id=p.inst_id
 ORDER BY temp_size_MB desc --b.tablespace, b.blocks */]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[TempFiles]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5872,7 +6816,7 @@ from cdb_temp_files
 order by con_id,file_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[gv$temp_extent_pool]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5885,7 +6829,7 @@ order by con_id,file_id]]></sql>
 from gv$temp_extent_pool tep]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[gv$temp_space_header]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5898,7 +6842,7 @@ from gv$temp_extent_pool tep]]></sql>
 from gv$temp_space_header tsh]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[Parameters]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5966,7 +6910,7 @@ from nls_session_parameters s
       full join nls_database_parameters db on s.parameter=db.parameter
 order by 1]]></sql>
 		</query>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[NLSValidValues]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5980,7 +6924,7 @@ from gv$nls_valid_values
 order by inst_id,parameter, isdeprecated, value, con_id]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[SessionConnectInfo]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -5994,7 +6938,7 @@ from gv$session_connect_info
 order by con_id, inst_id, sid, serial#]]></sql>
 			</query>
 		</display>
-		<display id="null" type="" style="Table" enable="true">
+		<display id="" type="" style="Table" enable="true">
 			<name><![CDATA[SessionConnectInfoBy_Charset]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
@@ -6010,5 +6954,795 @@ order by con_id, inst_id, client_charset]]></sql>
 			</query>
 		</display>
 	</display>
+	<folder>
+		<name><![CDATA[RMAN]]></name>
+		<tooltip><![CDATA[RMAN]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="4c18be3c-019c-1000-8002-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[RMAN Job Status]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT input_bytes_display, 
+       output_bytes_display, 
+       status, 
+       time_taken_display, 
+       det.* 
+  FROM V$RMAN_BACKUP_JOB_DETAILS det 
+ --WHERE TRUNC(START_TIME) > (TRUNC(SYSDATE)-1)
+ ORDER BY START_TIME DESC]]></sql>
+			</query>
+		</display>
+		<display id="4c18be3d-019c-1000-8003-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Job Throughput]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT 'DUPLICATE/RESTORE THROUGHPUT',
+  round(SUM(v.value/1024/1024),1) mbytes_sofar,
+  round(SUM(v.value     /1024/1024)/nvl((SELECT MIN(elapsed_seconds)
+  FROM v$session_longops
+  WHERE OPNAME LIKE 'RMAN: aggregate input'
+  AND SOFAR            != TOTALWORK
+  AND elapsed_seconds IS NOT NULL
+  ),SUM(v.value     /1024/1024)),2) mbytes_per_sec,
+  n.name
+  FROM gv$sesstat v,
+  v$statname n,
+  gv$session s 
+  WHERE v.statistic#=n.statistic# 
+  AND n.name = 'physical write total bytes'
+  AND v.sid = s.sid 
+  AND v.inst_id=s.inst_id 
+  AND s.program like 'rman@%'
+  GROUP BY 'DUPLICATE/RESTORE THROUGHPUT',n.name]]></sql>
+			</query>
+		</display>
+		<display id="4c18be3d-019c-1000-8004-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Backup Async IO (Work In Progress)]]></name>
+			<description><![CDATA[Based on:
+http://www.vitalsofttech.com/rman-backup-async-io-rate/]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT det.START_TIME, det.END_TIME,
+       status, 
+       time_taken_display,
+       ROUND(OUTPUT_BYTES/1024/1024) as OUTPUT_MB,
+       ROUND(((END_TIME-START_TIME)*(24*60*60))) as RUN_SECONDS,
+       ROUND(OUTPUT_BYTES_PER_SEC/1024/1024,2) as OUTPUT_MB_PER_SEC
+  FROM V$RMAN_BACKUP_JOB_DETAILS det 
+ WHERE STATUS <> 'FAILED'
+ ORDER BY START_TIME DESC]]></sql>
+			</query>
+		</display>
+		<display id="4c18be3d-019c-1000-8005-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Running RMAN Jobs]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT input_bytes_display, 
+       output_bytes_display, 
+       status, 
+       time_taken_display, 
+       det.* 
+  FROM V$RMAN_BACKUP_JOB_DETAILS det 
+WHERE STATUS='RUNNING'
+ ORDER BY START_TIME DESC]]></sql>
+			</query>
+		</display>
+	</folder>
+	<folder>
+		<name><![CDATA[Session Info]]></name>
+		<tooltip><![CDATA[Session Info]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="4c1a32f2-019c-1000-8007-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Idle Session Detail ( < 1 Day )]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select sid, serial#, username, osuser, machine, module, LAST_CALL_ET, ROUND(LAST_CALL_ET/3600/24,2) AS DAYS,   (SELECT DISTINCT SQL_TEXT FROM V$SQL WHERE SQL_ID=PREV_SQL_ID) as SQL_TEXT,
+'alter system kill session '''||sid||','||serial#||''';' as sql
+from v$session
+where last_call_et > (1*24*3600)
+and STATUS='INACTIVE'
+and USERNAME NOT IN ('SYS','SYSTEM')
+ORDER BY LAST_CALL_ET]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f2-019c-1000-8008-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Sessions By Last Call ET in Days]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT INST_ID, USERNAME, DAYS_INACTIVE, COUNT(*) SESSION_COUNT 
+FROM (select INST_ID, USERNAME, osuser, machine, last_call_et, ROUND(last_call_et/24/60/60) as days_inactive, status 
+        From gv$session 
+       where osuser NOT IN ('oracle')
+      order by last_call_et desc)
+    GROUP BY INST_ID, USERNAME, DAYS_INACTIVE
+    ORDER BY INST_ID, DAYS_INACTIVE]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f2-019c-1000-8009-a9fe632cd7a4" type="" style="Chart" enable="true">
+			<name><![CDATA[Sessions by Last Call ET - Graph]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<Y1AXIS_TITLE_TEXT><![CDATA[Inactive Session Count]]></Y1AXIS_TITLE_TEXT>
+				<PLOT_DATATIPS_TEXT><![CDATA[true]]></PLOT_DATATIPS_TEXT>
+				<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+				<Y1AXIS_LOGARITHMIC_SCALE><![CDATA[false]]></Y1AXIS_LOGARITHMIC_SCALE>
+				<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+				<Y1AXIS_TITLE_FONT.POSTURE><![CDATA[false]]></Y1AXIS_TITLE_FONT.POSTURE>
+				<LEGEND><![CDATA[false]]></LEGEND>
+				<DATA_MAP_COLUMNS><![CDATA[\,"DAYS_INACTIVE"]]></DATA_MAP_COLUMNS>
+				<TITLE_FONT.POSTURE><![CDATA[false]]></TITLE_FONT.POSTURE>
+				<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
+				<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+				<XAXIS_TITLE_FONT.WEIGHT><![CDATA[true]]></XAXIS_TITLE_FONT.WEIGHT>
+				<TYPE><![CDATA[BAR_VERT_STACK]]></TYPE>
+				<DATA_MAP_COUNT><![CDATA[1]]></DATA_MAP_COUNT>
+				<STYLE><![CDATA[Default]]></STYLE>
+				<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+				<Y1AXIS_TITLE_FONT.SIZE><![CDATA[12]]></Y1AXIS_TITLE_FONT.SIZE>
+				<Y1AXIS_TITLE_FONT.NAME><![CDATA[SansSerif]]></Y1AXIS_TITLE_FONT.NAME>
+				<XAXIS_SCALE_MAXIMUM><![CDATA[70.0]]></XAXIS_SCALE_MAXIMUM>
+				<TITLE_TEXT><![CDATA[Idle Session Summary]]></TITLE_TEXT>
+				<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+				<PLOT_HGRID><![CDATA[true]]></PLOT_HGRID>
+				<PLOT_DATATIPS_VALUE><![CDATA[true]]></PLOT_DATATIPS_VALUE>
+				<XAXIS_TITLE_FONT.COLOR><![CDATA[-9144422]]></XAXIS_TITLE_FONT.COLOR>
+				<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+				<TITLE_FONT.UNDERLINE><![CDATA[false]]></TITLE_FONT.UNDERLINE>
+				<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+				<TITLE_FONT.NAME><![CDATA[SansSerif]]></TITLE_FONT.NAME>
+				<XAXIS_TITLE_FONT.POSTURE><![CDATA[false]]></XAXIS_TITLE_FONT.POSTURE>
+				<XAXIS_TITLE_TEXT><![CDATA[Days Inactive]]></XAXIS_TITLE_TEXT>
+				<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+				<TITLE_FONT.COLOR><![CDATA[-12565927]]></TITLE_FONT.COLOR>
+				<XAXIS_TICK_LABEL_AUTO_ROTATE><![CDATA[true]]></XAXIS_TICK_LABEL_AUTO_ROTATE>
+				<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+				<PLOT_DATATIPS_CUMULATIVE_VALUE><![CDATA[false]]></PLOT_DATATIPS_CUMULATIVE_VALUE>
+				<TITLE_FONT.SIZE><![CDATA[18]]></TITLE_FONT.SIZE>
+				<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+				<PLOT_SERIES_OPTIONS_FITLINE_TYPE><![CDATA[\,LINEAR,NONE,NONE,NONE,NONE]]></PLOT_SERIES_OPTIONS_FITLINE_TYPE>
+				<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+				<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+				<GRADIENT><![CDATA[false]]></GRADIENT>
+				<PLOT_DATALABELS_SLICE_POSITION><![CDATA[OUTSIDE_SLICE]]></PLOT_DATALABELS_SLICE_POSITION>
+				<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+				<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+				<XAXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></XAXIS_LOGARITHMIC_BASE>
+				<PLOT_DATALABELS><![CDATA[true]]></PLOT_DATALABELS>
+				<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+				<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+				<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
+				<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+				<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[MANUAL]]></XAXIS_TICK_LABEL_SKIP_MODE>
+				<DATA_MAP_COLNAMES><![CDATA[\,"DAYS_INACTIVE","SESSION_COUNT"]]></DATA_MAP_COLNAMES>
+				<PLOT_RGRID_WIDTH><![CDATA[THINNER]]></PLOT_RGRID_WIDTH>
+				<DATA_MAP_SERIES><![CDATA[\,"DAYS_INACTIVE"]]></DATA_MAP_SERIES>
+				<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+				<GRID><![CDATA[false]]></GRID>
+				<TITLE_FONT.WEIGHT><![CDATA[true]]></TITLE_FONT.WEIGHT>
+				<XAXIS_SCALE_INCREMENT><![CDATA[10.0]]></XAXIS_SCALE_INCREMENT>
+				<XAXIS_TITLE_FONT.UNDERLINE><![CDATA[false]]></XAXIS_TITLE_FONT.UNDERLINE>
+				<PLOT_DATALABELS_SLICE_TYPE><![CDATA[PERCENT_VALUE]]></PLOT_DATALABELS_SLICE_TYPE>
+				<Y1AXIS_SCALE_MINIMUM_AUTOMATIC><![CDATA[true]]></Y1AXIS_SCALE_MINIMUM_AUTOMATIC>
+				<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+				<XAXIS_TITLE><![CDATA[true]]></XAXIS_TITLE>
+				<THREED><![CDATA[false]]></THREED>
+				<Y1AXIS_TITLE_FONT.COLOR><![CDATA[-9144422]]></Y1AXIS_TITLE_FONT.COLOR>
+				<DATA_MAP_VALUES><![CDATA[\,"SESSION_COUNT"]]></DATA_MAP_VALUES>
+				<XAXIS_TITLE_FONT.NAME><![CDATA[SansSerif]]></XAXIS_TITLE_FONT.NAME>
+				<Y1AXIS_TITLE_FONT.WEIGHT><![CDATA[true]]></Y1AXIS_TITLE_FONT.WEIGHT>
+				<TITLE><![CDATA[true]]></TITLE>
+				<XAXIS_TITLE_FONT.SIZE><![CDATA[12]]></XAXIS_TITLE_FONT.SIZE>
+				<Y1AXIS_TITLE><![CDATA[true]]></Y1AXIS_TITLE>
+				<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+				<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+				<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+				<Y1AXIS_TITLE_FONT.UNDERLINE><![CDATA[false]]></Y1AXIS_TITLE_FONT.UNDERLINE>
+				<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT --USERNAME, 
+       DAYS_INACTIVE, COUNT(*) SESSION_COUNT FROM (
+select USERNAME, osuser, machine, last_call_et, ROUND(last_call_et/24/60/60) as days_inactive, status From gv$session 
+where osuser NOT IN ('oracle')
+order by last_call_et desc)
+GROUP BY DAYS_INACTIVE
+ORDER BY DAYS_INACTIVE]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f2-019c-1000-800a-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Killed Session Status]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select s.username, s.sid, s.serial#, s.logon_time, s.last_call_et, p.spid as UNIX_PROCESS_ID, 'kill -9 '||p.SPID as UnixKillStmt
+FROM v$session s, v$process p 
+WHERE S.PADDR=P.ADDR
+  AND S.STATUS='KILLED'
+ORDER BY S.LAST_CALL_ET DESC]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f2-019c-1000-800b-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Top Sessions Using TEMP]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[-- What SQL Statements/Sessions are using the most TEMP on a RAC Database? 
+SELECT u.INST_ID,
+  s.sid sid,
+  s.username,
+  a.sql_id,
+  a.plan_hash_value,
+  ROUND(((u.blocks*p.value)/1024/1024),2) size_mb,
+  u.tablespace,
+  a.sql_text
+FROM gv$sort_usage u,
+  gv$session s,
+  gv$sqlarea a,
+  gv$parameter p
+WHERE s.saddr        = u.session_addr
+AND s.INST_ID        =u.INST_ID
+AND a.address (+)    = s.sql_address
+AND a.hash_value (+) = s.sql_hash_value
+AND a.INST_ID (+)    = s.INST_ID
+AND p.name           = 'db_block_size'
+AND p.INST_ID        =u.INST_ID
+AND s.username      != 'SYSTEM'
+GROUP BY u.INST_ID,
+  s.sid,
+  s.username,
+  a.sql_id,
+  a.plan_hash_value,
+  a.sql_text,
+  u.tablespace,
+  ROUND(((u.blocks       *p.value)/1024/1024),2)
+HAVING ROUND(((u.blocks  *p.value)/1024/1024),2) > 10
+ORDER BY ROUND(((u.blocks*p.value)/1024/1024),2) DESC;]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f3-019c-1000-800c-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Session Count Watcher (RAC)]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[-- Min, Max, Low Thresh, Upper Thresh, Value
+select inst_id, 
+       count(*), 
+       'SQLDEV:GAUGE:0:'||
+       (select value from v$parameter where name='sessions')||':'||
+       (select ROUND(value*0.80) from v$parameter where name='sessions')||':'||
+       (select ROUND(value*0.90) from v$parameter where name='sessions')||':'||
+       COUNT(*) as "Gauge                         "
+from gv$session 
+group by inst_id order by inst_id]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f3-019c-1000-800d-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Idle Session Detail - by LAST_CALL_ET DESC]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select inst_id, sid, serial#, username, osuser, machine, module, LAST_CALL_ET, ROUND(LAST_CALL_ET/3600/24,2) AS DAYS,   (SELECT DISTINCT SQL_TEXT FROM V$SQL WHERE SQL_ID=PREV_SQL_ID) as SQL_TEXT,
+'alter system kill session '''||sid||','||serial#||''';' as sql
+from gv$session
+where STATUS='INACTIVE'
+and USERNAME NOT IN ('SYS','SYSTEM')
+ORDER BY LAST_CALL_ET ASC]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f3-019c-1000-800e-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[PGA In Use/Allocated Per Session]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[-- PGA Memory in Use for Sessions
+SELECT s.inst_id,
+  s.sid,
+  s.username,
+  s.logon_time,
+  s.program,
+  ROUND(PGA_USED_MEM /1024/1024,1) PGA_USED_MEM_MB,
+  ROUND(PGA_ALLOC_MEM/1024/1024,1) PGA_ALLOC_MEM_MB
+FROM gv$session s ,
+  gv$process p
+WHERE s.paddr = p.addr
+AND s.inst_id = p.inst_id
+ORDER BY PGA_USED_MEM DESC;]]></sql>
+			</query>
+		</display>
+		<display id="4c1a32f3-019c-1000-800f-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[PGA In Use/Allocated Per Instance]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[-- PGA Memory in Use for Sessions
+SELECT s.inst_id,
+  ROUND(SUM(PGA_USED_MEM) /1024/1024,1) PGA_USED_MEM_MB,
+  ROUND(SUM(PGA_ALLOC_MEM) /1024/1024,1) PGA_ALLOC_MEM_MB
+FROM gv$session s ,
+  gv$process p
+WHERE s.paddr = p.addr
+AND s.inst_id = p.inst_id
+GROUP BY s.INST_ID
+ORDER BY s.INST_ID;]]></sql>
+			</query>
+		</display>
+	</folder>
+	<folder>
+		<name><![CDATA[DataGuard]]></name>
+		<tooltip><![CDATA[DataGuard]]></tooltip>
+		<description><![CDATA[ http://www.pythian.com/blog/oracle-standby-recovery-rate-monitoring/
+https://docs.oracle.com/cd/B28359_01/server.111/b28320/dynviews_1093.htm#REFRN30413
+]]></description>
+			<folder>
+			<name><![CDATA[Primary]]></name>
+			<tooltip><![CDATA[Primary]]></tooltip>
+			<description><![CDATA[ ]]></description>
+			</folder>
+		<folder>
+			<name><![CDATA[Standby]]></name>
+			<tooltip><![CDATA[Standby]]></tooltip>
+			<description><![CDATA[ ]]></description>
+				<display id="4c1b66f9-019c-1000-8010-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[Log Apply Status Detail]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select TO_CHAR(TIMESTAMP,'YYYY-MM-DD HH24:MI') TIMESTAMP,
+TO_CHAR(completion_time,'YYYY-MM-DD HH24:MI') "ArchTime",
+SEQUENCE#,round((blocks*block_size)/(1024*1024),1) "SizeM",
+round((TIMESTAMP-lag(TIMESTAMP,1,TIMESTAMP) OVER (order by TIMESTAMP))*24*60*60,1) "Diff(sec)",
+round((blocks*block_size)/1024/ decode(((TIMESTAMP-lag(TIMESTAMP,1,TIMESTAMP)
+OVER (order by TIMESTAMP))*24*60*60),0,1,
+(TIMESTAMP-lag(TIMESTAMP,1,TIMESTAMP) OVER (order by TIMESTAMP))*24*60*60),1) "KB/sec",
+round((blocks*block_size)/(1024*1024)/ decode(((TIMESTAMP-lag(TIMESTAMP,1,TIMESTAMP)
+OVER (order by TIMESTAMP))*24*60*60),0,1,
+(TIMESTAMP-lag(TIMESTAMP,1,TIMESTAMP) OVER (order by TIMESTAMP))*24*60*60),3) "MB/sec",
+round(((lead(TIMESTAMP,1,TIMESTAMP) over (order by TIMESTAMP))-completion_time)*24*60*60,1) "Lag(sec)"
+from v$archived_log a, v$dataguard_status dgs
+where a.name = replace(dgs.MESSAGE,'Media Recovery Log ','')
+and dgs.FACILITY = 'Log Apply Services'
+order by TIMESTAMP desc]]></sql>
+				</query>
+			</display>
+			<display id="4c1b66f9-019c-1000-8011-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[Log Receive/Apply Status by Thread]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select THREAD#, 
+(select max(sequence#) "Last Standby Seq Received" 
+from v$archived_log val, v$database vdb 
+where val.resetlogs_change# = vdb.resetlogs_change# 
+  AND THREAD#=gv$instance.THREAD#
+group by thread#) as LAST_SEQ_RECEIVED,
+(select max(sequence#) "Last Standby Seq Applied" 
+from v$archived_log val, v$database vdb 
+where val.resetlogs_change# = vdb.resetlogs_change# 
+and val.applied in ('YES','IN-MEMORY') 
+  AND THREAD#=gv$instance.THREAD#
+group by thread#) as LAST_SEQ_APPLIED
+From gv$instance]]></sql>
+				</query>
+			</display>
+			<display id="4c1b66f9-019c-1000-8012-a9fe632cd7a4" type="" style="Table" enable="true">
+				<name><![CDATA[Current SCN to Timestamp]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT TO_CHAR(scn_to_timestamp((select current_scn from v$database)),'YYYY-MM-DD HH24:MI') AS CURRENT_SCN_TO_TIMESTAMP 
+FROM DUAL]]></sql>
+				</query>
+			</display>
+		</folder>
+	</folder>
+	<folder>
+		<name><![CDATA[LocksBlocks]]></name>
+		<tooltip><![CDATA[LocksBlocks]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="4c1c4b7d-019c-1000-8013-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Idle Sessions with Locks (2 hours or older)]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[-- Idle Session Lock Summary
+WITH LOCKSUMMARY AS (select INST_ID, SESSION_ID AS SID,COUNT(*) as LOCKED_OBJECT_COUNT FROM gv$locked_object GROUP BY INST_ID, SESSION_ID)
+select gv$session.sid, gv$session.inst_id, LAST_CALL_ET, LOCKED_OBJECT_COUNT
+from gv$session JOIN locksummary ls ON gv$session.sid=ls.sid AND gv$session.inst_id=ls.inst_id
+where status='INACTIVE' AND last_call_et > 7200 
+order by last_call_et DESC;]]></sql>
+			</query>
+		</display>
+		<display id="4c1c4b7d-019c-1000-8014-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Blocked Sessions]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT gvh.SID sessid,
+  gvs.serial# serial,
+  gvh.inst_id instance_id,
+  gvs.*
+FROM gv$lock gvh,
+  gv$lock gvw,
+  gv$session gvs
+WHERE (gvh.id1, gvh.id2) IN
+  (SELECT id1, id2 FROM gv$lock WHERE request = 0
+  INTERSECT
+  SELECT id1, id2 FROM gv$lock WHERE lmode = 0
+  )
+AND gvh.id1     = gvw.id1
+AND gvh.id2     = gvw.id2
+AND gvh.request = 0
+AND gvw.lmode   = 0
+AND gvh.SID     = gvs.SID
+AND gvh.inst_id = gvs.inst_id]]></sql>
+			</query>
+		</display>
+		<display id="4c1c4b7d-019c-1000-8015-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Idle Session Locked Object Detail (2 hours+)]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT gv$session.sid,
+  gv$session.inst_id,
+  username,
+  osuser,
+  machine,
+  LAST_CALL_ET as SECS_SINCE_LAST_CALL,
+  ROUND(LAST_CALL_ET/3600,1) as HRS_SINCE_LAST_CALL,
+  lo.object_id,
+  (SELECT owner||'.'||object_name FROM dba_objects WHERE object_id=lo.object_id) AS OBJECT_NAME
+FROM gv$session
+JOIN gv$locked_object lo
+ON gv$session.sid     =lo.session_id
+AND gv$session.inst_id=lo.inst_id
+WHERE status          ='INACTIVE'
+AND last_call_et      > 7200
+ORDER BY last_call_et DESC]]></sql>
+			</query>
+		</display>
+		<display id="4c1c4b7e-019c-1000-8016-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[John's Lock Query]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select s1.username || '@' || s1.machine 
+|| ' ( INST_ID='||s1.INST_ID||' SID=' || s1.sid || ' )  is blocking ' 
+|| s2.username || '@' || s2.machine || ' ( INST_ID= '||s2.INST_ID||' SID=' || s2.sid || ' ) ' AS blocking_status 
+from gv$lock l1, gv$session s1, gv$lock l2, gv$session s2 
+where (s1.sid=l1.sid and s1.INST_ID=l1.INST_ID) and (s2.sid=l2.sid and s2.INST_ID=l2.INST_ID) 
+and l1.BLOCK=1 and l2.request > 0 
+and (l1.id1 = l2.id1) 
+and l1.id2 = l2.id2]]></sql>
+			</query>
+		</display>
+	</folder>
+	<folder>
+		<name><![CDATA[Auditing]]></name>
+		<tooltip><![CDATA[Auditing]]></tooltip>
+		<description><![CDATA[ ]]></description>
+			<display id="4c1eaa1c-019c-1000-8042-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Invalid Username/Password]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT TO_CHAR(TIMESTAMP,'YYYY-MM-DD HH24:MI') as Time, 
+       USERNAME, 
+       OS_USERNAME,
+       USERHOST, RETURNCODE
+  FROM DBA_AUDIT_TRAIL
+ WHERE --USERNAME=UPPER(:username_like_expr) AND 
+   RETURNCODE=1017 OR RETURNCODE=28001
+ ORDER BY TIMESTAMP DESC]]></sql>
+			</query>
+		</display>
+		<display id="4c1eaa1c-019c-1000-8043-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Recent Login/Logouts via AUD$]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT USERID, NAME, USERHOST, NTIMESTAMP#, RETURNCODE, userhost  
+FROM sys.aud$ A, AUDIT_ACTIONS AA 
+WHERE A.ACTION#=AA.ACTION
+  AND AA.NAME IN ('LOGON','LOGOFF') 
+  AND userid NOT IN ('DBSNMP')
+ORDER BY NTIMESTAMP# DESC]]></sql>
+			</query>
+		</display>
+		<display id="4c1eaa1d-019c-1000-8044-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[Recent User App Login Activity]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT TO_CHAR(TIMESTAMP,'YYYY-MM-DD HH24:MI:SS') as Time, 
+       USERNAME, 
+       OS_USERNAME, 
+       USERHOST, ACTION_NAME, RETURNCODE, 
+       CASE RETURNCODE
+         WHEN 0 THEN 'OK'
+         WHEN 1017 THEN 'Wrong Username/Password'
+         WHEN 28000 THEN 'Locked Account'
+         WHEN 28001 THEN 'Expired Account'
+         WHEN 28002 THEN 'Password will expire in x days'
+         WHEN 28003 THEN 'Password verification failed'
+         WHEN 28004 THEN 'Password verification failed'
+         WHEN 28007 THEN 'Password cannot be reused'
+       END as Message
+  FROM DBA_AUDIT_TRAIL
+  WHERE USERNAME NOT IN ('SYS','SYSTEM','DII','DBSNMP')
+ ORDER BY TIMESTAMP DESC]]></sql>
+			</query>
+		</display>
+		<display id="4c3d2473-019c-1000-804d-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[aud$]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from sys.aud$
+order by ntimestamp# desc]]></sql>
+			</query>
+		</display>
+		<display id="4c3e8699-019c-1000-804e-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[AuditTrail]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from sys.cdb_audit_trail
+order by timestamp desc]]></sql>
+			</query>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[Parameters]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * from gv$parameter where name like 'audit%']]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[OBJ_AUDIT_OPTS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM CDB_OBJ_AUDIT_OPTS]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[PRIV_AUDIT_OPTS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM CDB_PRIV_AUDIT_OPTS]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[STMT_AUDIT_OPTS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM CDB_STMT_AUDIT_OPTS]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[AUDIT_EXISTS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM CDB_AUDIT_EXISTS ORDER BY TIMESTAMP DESC]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[AUDIT_OBJECT]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM CDB_AUDIT_OBJECT ORDER BY TIMESTAMP DESC]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[AUDIT_SESSION]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM CDB_AUDIT_SESSION ORDER BY TIMESTAMP DESC]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[AUDIT_STATEMENT]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM CDB_AUDIT_STATEMENT ORDER BY TIMESTAMP DESC]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[AUDIT_TRAIL]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from sys.cdb_audit_trail
+order by timestamp desc]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[AUDIT_ACTIONS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * from AUDIT_ACTIONS order by action]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[DEF_AUDIT_OPTS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * from ALL_DEF_AUDIT_OPTS]]></sql>
+				</query>
+			</display>
+		</display>
+		<display id="4c56d3d1-019c-1000-805c-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[UNIFIED_AUDIT]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[SELECT * 
+FROM UNIFIED_AUDIT_TRAIL
+order by event_timestamp desc]]></sql>
+			</query>
+		</display>
+	</folder>
 </folder>
 </displays>
