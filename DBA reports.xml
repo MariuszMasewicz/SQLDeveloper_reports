@@ -4,277 +4,7 @@
 	<name><![CDATA[DBA reports]]></name>
 	<tooltip><![CDATA[DBA reports]]></tooltip>
 	<description><![CDATA[ ]]></description>
-		<display id="e9970c1f-018c-1000-802d-ac120052d4bc" type="" style="Table" enable="true">
-		<name><![CDATA[Scheduler]]></name>
-		<description><![CDATA[]]></description>
-		<tooltip><![CDATA[]]></tooltip>
-		<drillclass><![CDATA[]]></drillclass>
-		<CustomValues>
-			<TYPE><![CDATA[horizontal]]></TYPE>
-		</CustomValues>
-		<query minversion="12">
-			<sql><![CDATA[select 
-'SQLDEV:LINK:'
-       || owner
-       || ':'
-       || 'SCHNEWJOB' -- object_type
-       || ':'
-       || job_name
-       || ':'||job_name||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS details,
-j.*,
-'exec DBMS_SCHEDULER.enable(name=>''"'||owner||'"."'||job_name||'"'');' enable_job,
-'exec DBMS_SCHEDULER.disable(name=>''"'||owner||'"."'||job_name||'"'', force => TRUE);' disable_job,
-'exec DBMS_SCHEDULER.RUN_JOB(name=>''"'||owner||'"."'||job_name||'"'', USE_CURRENT_SESSION => FALSE);' run_job,
-'exec DBMS_SCHEDULER.STOP_JOB(job_name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE);' stop_job,
-'exec DBMS_SCHEDULER.DROP_JOB(name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE, defer => TRUE);' drop_job
-from cdb_scheduler_jobs j
-order by owner, job_name]]></sql>
-		</query>
-		<query maxversion="11">
-			<sql><![CDATA[select 
-'SQLDEV:LINK:'
-       || owner
-       || ':'
-       || 'SCHNEWJOB' -- object_type
-       || ':'
-       || job_name
-       || ':'||job_name||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS details,
-j.*,
-'exec DBMS_SCHEDULER.enable(name=>''"'||owner||'"."'||job_name||'"'');' enable_job,
-'exec DBMS_SCHEDULER.disable(name=>''"'||owner||'"."'||job_name||'"'', force => TRUE);' disable_job,
-'exec DBMS_SCHEDULER.RUN_JOB(name=>''"'||owner||'"."'||job_name||'"'', USE_CURRENT_SESSION => FALSE);' run_job,
-'exec DBMS_SCHEDULER.STOP_JOB(job_name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE);' stop_job,
-'exec DBMS_SCHEDULER.DROP_JOB(name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE, defer => TRUE);' drop_job
-from dba_scheduler_jobs j
-order by owner, job_name]]></sql>
-		</query>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[Running jobs]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from cdb_SCHEDULER_RUNNING_JOBS
---where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
-order by owner, job_name]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[Job run details]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from cdb_SCHEDULER_JOB_RUN_DETAILS
-where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
-  and (CON_ID=:CON_ID)
-order by LOG_ID desc --,LOG_DATE desc]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CON_ID">
-						<prompt><![CDATA[CON_ID]]></prompt>
-						<tooltip><![CDATA[CON_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[Job log]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from CDB_SCHEDULER_JOB_LOG
-where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
-  and (CON_ID=:CON_ID)
-order by LOG_ID desc --,LOG_DATE desc]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CON_ID">
-						<prompt><![CDATA[CON_ID]]></prompt>
-						<tooltip><![CDATA[CON_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[Global attribute]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from DBA_SCHEDULER_GLOBAL_ATTRIBUTE
-order by ATTRIBUTE_NAME]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[Instance parameters]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[SELECT * FROM GV$PARAMETER
---where 
---name like 'job%'
-order by isdefault, name]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Chart" enable="true">
-			<name><![CDATA[Job duration and CPU]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<Y1AXIS_TITLE_TEXT><![CDATA[[s]]]></Y1AXIS_TITLE_TEXT>
-				<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
-				<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
-				<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
-				<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
-				<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
-				<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
-				<Y1AXIS_REFOBJ_COUNT><![CDATA[0]]></Y1AXIS_REFOBJ_COUNT>
-				<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
-				<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
-				<Y1AXIS_REFOBJ_LINE_VALUE><![CDATA[\]]></Y1AXIS_REFOBJ_LINE_VALUE>
-				<DATA_MAP_COLUMNS><![CDATA[\,"ACTUAL_START_DATE","ACTUAL_START_DATE",]]></DATA_MAP_COLUMNS>
-				<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
-				<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
-				<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
-				<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
-				<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
-				<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
-				<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
-				<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
-				<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
-				<Y1AXIS_REFOBJ_VISIBLE><![CDATA[\]]></Y1AXIS_REFOBJ_VISIBLE>
-				<DATA_MAP_COLNAMES><![CDATA[\,"ACTUAL_START_DATE","ADDITIONAL_INFO","BINARY_ERRORS","BINARY_OUTPUT","CPU_USED","CPU_USED_SEC","CREDENTIAL_NAME","CREDENTIAL_OWNER","DESTINATION","DESTINATION_OWNER","ERROR#","ERRORS","INSTANCE_ID","JOB_NAME","JOB_SUBNAME","LOG_DATE","LOG_ID","OUTPUT","OWNER","REQ_START_DATE","RUN_DURATION","RUN_DURATION_SEC","SESSION_ID","SLAVE_PID","STATUS"]]></DATA_MAP_COLNAMES>
-				<DATA_MAP_SERIES><![CDATA[\,DURATION,CPU,]]></DATA_MAP_SERIES>
-				<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
-				<DATA_MAP_COUNT><![CDATA[3]]></DATA_MAP_COUNT>
-				<STYLE><![CDATA[Default]]></STYLE>
-				<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
-				<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
-				<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
-				<XAXIS_TITLE><![CDATA[false]]></XAXIS_TITLE>
-				<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
-				<DATA_MAP_VALUES><![CDATA[\,"RUN_DURATION_SEC","CPU_USED_SEC",]]></DATA_MAP_VALUES>
-				<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
-				<Y1AXIS_REFOBJ_TEXT><![CDATA[\]]></Y1AXIS_REFOBJ_TEXT>
-				<Y1AXIS_REFOBJ_WIDTH><![CDATA[\]]></Y1AXIS_REFOBJ_WIDTH>
-				<Y1AXIS_TITLE><![CDATA[true]]></Y1AXIS_TITLE>
-				<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
-				<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
-				<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
-				<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
-				<Y1AXIS_REFOBJ_COLOR><![CDATA[\]]></Y1AXIS_REFOBJ_COLOR>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select j.*, 
-abs( extract( second from RUN_DURATION ) 
-          + extract( minute from RUN_DURATION ) * 60 
-          + extract( hour from RUN_DURATION ) * 60 * 60 
-          + extract( day from RUN_DURATION ) * 60 * 60 * 24
-            ) as RUN_DURATION_SEC,
-abs( extract( second from CPU_USED ) 
-          + extract( minute from CPU_USED ) * 60 
-          + extract( hour from CPU_USED ) * 60 * 60 
-          + extract( day from CPU_USED ) * 60 * 60 * 24
-            ) as CPU_USED_SEC
-from DBA_SCHEDULER_JOB_RUN_DETAILS j
-where 
-  (OWNER=:OWNER and JOB_name=:JOB_NAME) 
-order by LOG_DATE]]></sql>
-				<binds>
-					<bind id="OWNER">
-						<prompt><![CDATA[OWNER]]></prompt>
-						<tooltip><![CDATA[OWNER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="JOB_NAME">
-						<prompt><![CDATA[JOB_NAME]]></prompt>
-						<tooltip><![CDATA[JOB_NAME]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[AutoTasks]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select a.* ,
-'exec DBMS_AUTO_TASK_ADMIN.ENABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as enable,
-'exec DBMS_AUTO_TASK_ADMIN.DISABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as disable
-from DBA_AUTOTASK_CLIENT a]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[AutoStatsExecutions]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from DBA_AUTO_STAT_EXECUTIONS]]></sql>
-			</query>
-		</display>
-	</display>
-	<display id="ea0dfa57-018c-1000-8030-ac120052d4bc" type="" style="Table" enable="true">
+		<display id="ea0dfa57-018c-1000-8030-ac120052d4bc" type="" style="Table" enable="true">
 		<name><![CDATA[Autotasks]]></name>
 		<description><![CDATA[Details on 11g Autotasks (Stats and Advisors)]]></description>
 		<tooltip><![CDATA[]]></tooltip>
@@ -455,391 +185,6 @@ BEGIN
   end loop;  
 END;]]></sql>
 		</query>
-	</display>
-	<display id="1a264ca7-018d-1000-8009-0abcf0220279" type="" style="Table" enable="true">
-		<name><![CDATA[SQL]]></name>
-		<description><![CDATA[]]></description>
-		<tooltip><![CDATA[]]></tooltip>
-		<drillclass><![CDATA[]]></drillclass>
-		<CustomValues>
-			<TYPE><![CDATA[horizontal]]></TYPE>
-		</CustomValues>
-		<query>
-			<sql><![CDATA[select --s.sql_id, 
-       s.* from gv$sql s
-order by sql_id, last_load_time]]></sql>
-		</query>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[CursorPlan_all]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select *
-   from 
-   table(dbms_xplan.display_cursor(:SQL_ID,
-                                  :CHILD_NUMBER, 'ALL')) t
-where :SQL_ID is not null]]></sql>
-				<binds>
-					<bind id="SQL_ID">
-						<prompt><![CDATA[SQL_ID]]></prompt>
-						<tooltip><![CDATA[SQL_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CHILD_NUMBER">
-						<prompt><![CDATA[CHILD_NUMBER]]></prompt>
-						<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[CursorPlan_adaptive]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select *
-   from 
-   table(dbms_xplan.display_cursor(:SQL_ID,
-                                  :CHILD_NUMBER, 'ADAPTIVE')) t
-where :SQL_ID is not null]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLBindCapture]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_BIND_CAPTURE s 
---left join GV$SQL_BIND_METADATA m on utl_raw.compare(s.address,m.address)=0
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
-order by s.POSITION]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLCsHistogram]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_CS_HISTOGRAM s 
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
-order by bucket_id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLOptimizerEnv]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_OPTIMIZER_ENV s 
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
-order by id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLPLanStatistics]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_PLAN_STATISTICS s 
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
---order by id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLPLanStatisticsAll]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_PLAN_STATISTICS_ALL s 
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
-order by id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLRedirection]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select u.username, s.* 
-from GV$SQL_REDIRECTION s join all_users u on s.PARSING_USER_ID=u.USER_ID
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER]]></sql>
-				<binds>
-					<bind id="SQL_ID">
-						<prompt><![CDATA[SQL_ID]]></prompt>
-						<tooltip><![CDATA[SQL_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CHILD_NUMBER">
-						<prompt><![CDATA[CHILD_NUMBER]]></prompt>
-						<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLReoptimizatioHints]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_REOPTIMIZATION_HINTS s 
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
-order by hint_id]]></sql>
-				<binds>
-					<bind id="SQL_ID">
-						<prompt><![CDATA[SQL_ID]]></prompt>
-						<tooltip><![CDATA[SQL_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CHILD_NUMBER">
-						<prompt><![CDATA[CHILD_NUMBER]]></prompt>
-						<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLSharedCursor]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_SHARED_CURSOR s 
-where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
---order by id]]></sql>
-				<binds>
-					<bind id="SQL_ID">
-						<prompt><![CDATA[SQL_ID]]></prompt>
-						<tooltip><![CDATA[SQL_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CHILD_NUMBER">
-						<prompt><![CDATA[CHILD_NUMBER]]></prompt>
-						<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLWorkarea]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_WORKAREA s 
-where (s.sql_id=:SQL_ID  )
---and (s.address=:ADDRESS  ) 
-and s.CHILD_NUMBER=:CHILD_NUMBER
-order by operation_id]]></sql>
-				<binds>
-					<bind id="SQL_ID">
-						<prompt><![CDATA[SQL_ID]]></prompt>
-						<tooltip><![CDATA[SQL_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-					<bind id="CHILD_NUMBER">
-						<prompt><![CDATA[CHILD_NUMBER]]></prompt>
-						<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLWorkareaActive]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_WORKAREA_ACTIVE s 
-where (s.sql_id=:SQL_ID  or :SQL_ID is null)
---and (s.address=:ADDRESS  or :ADDRESS is null)
-order by operation_id]]></sql>
-				<binds>
-					<bind id="SQL_ID">
-						<prompt><![CDATA[SQL_ID]]></prompt>
-						<tooltip><![CDATA[SQL_ID]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLWorkareaHistogram]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQL_WORKAREA_HISTOGRAM
-order by 1,2]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLArea]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQLAREA s 
-where (s.sql_id=:SQL_ID  or :SQL_ID is null)
-and (s.address=:ADDRESS  or :ADDRESS is null)
---order by operation_id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLAreaPlanHash]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQLAREA_PLAN_HASH s 
-where (s.sql_id=:SQL_ID  or :SQL_ID is null)
-and (s.address=:ADDRESS  or :ADDRESS is null)
---order by operation_id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLStats]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQLSTATS s 
-where (s.sql_id=:SQL_ID  or :SQL_ID is null)
-and (s.address=:ADDRESS  or :ADDRESS is null)]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLStatsPlanHash]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQLSTATS_PLAN_HASH s 
-where (s.sql_id=:SQL_ID  or :SQL_ID is null)
-and (s.address=:ADDRESS  or :ADDRESS is null)]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLText]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQLTEXT s 
-where (s.sql_id=:SQL_ID  or :SQL_ID is null)
-and (s.address=:ADDRESS  or :ADDRESS is null)
-order by piece]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SQLTextWithNewlines]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from GV$SQLTEXT_WITH_NEWLINES s 
-where (s.sql_id=:SQL_ID  or :SQL_ID is null)
-and (s.address=:ADDRESS  or :ADDRESS is null)
-order by piece]]></sql>
-			</query>
-		</display>
 	</display>
 	<folder>
 		<name><![CDATA[RAC]]></name>
@@ -1587,270 +932,6 @@ order by name, inst_id]]></sql>
 			</query>
 		</display>
 	</folder>
-	<display id="36acad05-018d-1000-800f-ac19014670d5" type="" style="Table" enable="true">
-		<name><![CDATA[Users]]></name>
-		<description><![CDATA[]]></description>
-		<tooltip><![CDATA[]]></tooltip>
-		<drillclass><![CDATA[]]></drillclass>
-		<CustomValues>
-			<TYPE><![CDATA[horizontal]]></TYPE>
-		</CustomValues>
-		<query>
-			<sql><![CDATA[select 
-'SQLDEV:LINK:'
-       || username
-       || ':'
-       || 'USER' -- object_type
-       || ':'
-       || username
-       || ':'||username||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS details,
-u.*, 
-  'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
-  'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
-  'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
-  'alter session set current_schema = "'||u.username||'";' as change_schema,
-  'alter user "'||u.username||'" default tablespace <TBS NAME>;' change_tablespace,
-  'alter user "'||u.username||'" default temporary tablespace <TEMP NAME>;' change_temp_tablespace,
-  'DROP USER "'||u.username||'" CASCADE;' as drop_user
-from cdb_users u
-order by username, con_id]]></sql>
-		</query>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[UserProfile]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from dba_profiles
-where profile=:PROFILE or :PROFILE is null
-order by profile, resource_type, resource_name]]></sql>
-				<binds>
-					<bind id="PROFILE">
-						<prompt><![CDATA[PROFILE]]></prompt>
-						<tooltip><![CDATA[PROFILE]]></tooltip>
-						<value><![CDATA[NULL_VALUE]]></value>
-						<bracket><![CDATA[null]]></bracket>
-					</bind>
-				</binds>
-			</query>
-			<query>
-				<sql><![CDATA[select * 
-from cdb_profiles
-where ((profile=:PROFILE or :PROFILE is null) and (CON_ID=:CON_ID or :CON_ID is null))
-order by profile, resource_type, resource_name, CON_ID]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[ObjectPrivileges]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from DBA_TAB_PRIVS
-where grantee=:USERNAME or :USERNAME is null
-order by grantee, owner, table_name, privilege]]></sql>
-			</query>
-			<query>
-				<sql><![CDATA[select * 
-from cdb_TAB_PRIVS
-where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
-order by grantee, owner, table_name, privilege, con_id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[SystemPrivileges]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from DBA_SYS_PRIVS
-where grantee=:USERNAME or :USERNAME is null
-order by grantee, privilege]]></sql>
-			</query>
-			<query>
-				<sql><![CDATA[select * 
-from cdb_SYS_PRIVS
-where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
-order by grantee, privilege, con_id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[Roles]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select * 
-from DBA_ROLE_PRIVS
-where grantee=:USERNAME or :USERNAME is null
-order by grantee, granted_role]]></sql>
-			</query>
-			<query>
-				<sql><![CDATA[select * 
-from cdb_ROLE_PRIVS
-where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
-order by grantee, granted_role, con_id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[All Privileges]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select
-  lpad(' ', 2*level) || granted_role "User, his roles and privileges"
-from
-  (
-  /* THE USERS */
-    select 
-      null     grantee, 
-      username granted_role
-    from 
-      cdb_users where ((username=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null))
-  /* THE ROLES TO ROLES RELATIONS */ 
-  union
-    select 
-      grantee,
-      granted_role
-    from
-      cdb_role_privs
-    where
-      (CON_ID=:CON_ID or :CON_ID is null)
-  /* THE ROLES TO PRIVILEGE RELATIONS */ 
-  union
-    select
-      grantee,
-      privilege
-    from
-      cdb_sys_privs
-    where 
-    (CON_ID=:CON_ID or :CON_ID is null)
-  )
-start with grantee is null
-connect by grantee = prior granted_role]]></sql>
-			</query>
-			<query>
-				<sql><![CDATA[select
-  lpad(' ', 2*level) || granted_role "User, his roles and privileges"
-from
-  (
-  /* THE USERS */
-    select 
-      null     grantee, 
-      username granted_role
-    from 
-      dba_users where (username=:USERNAME or :USERNAME is null) 
-  /* THE ROLES TO ROLES RELATIONS */ 
-  union
-    select 
-      grantee,
-      granted_role
-    from
-      dba_role_privs
-  /* THE ROLES TO PRIVILEGE RELATIONS */ 
-  union
-    select
-      grantee,
-      privilege
-    from
-      dba_sys_privs
-  )
-start with grantee is null
-connect by grantee = prior granted_role]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[UserObjects]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select 
-'SQLDEV:LINK:'
-     ||owner
-     ||':'
-     ||object_type
-     ||':'
-     ||object_name
-     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
-     o.* 
-from CDB_OBJECTS o
-where (con_id=:CON_ID or :CON_ID is null) and owner=:USERNAME
-order by owner, object_name, object_id]]></sql>
-			</query>
-			<query>
-				<sql><![CDATA[select 
-'SQLDEV:LINK:'
-     ||owner
-     ||':'
-     ||object_type
-     ||':'
-     ||object_name
-     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
-     o.* 
-from dba_OBJECTS o
-where owner=:USERNAME
-order by owner, object_name, object_id]]></sql>
-			</query>
-		</display>
-		<display id="" type="" style="Table" enable="true">
-			<name><![CDATA[UserSegments]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-				<TYPE><![CDATA[horizontal]]></TYPE>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[select 'SQLDEV:LINK:'
-     ||owner
-     ||':'
-     ||segment_type
-     ||':'
-     ||segment_name
-     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
-     s.* 
-from CDB_SEGMENTS s
-where (con_id=:CON_ID or :CON_ID is null) and owner=:USERNAME
-order by owner, SEGMENT_name--, object_id]]></sql>
-			</query>
-			<query>
-				<sql><![CDATA[select 'SQLDEV:LINK:'
-     ||owner
-     ||':'
-     ||segment_type
-     ||':'
-     ||segment_name
-     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
-     s.* 
-from dba_SEGMENTS s
-where owner=:USERNAME
-order by owner, SEGMENT_name--, object_id]]></sql>
-			</query>
-		</display>
-	</display>
 	<folder>
 		<name><![CDATA[Statspack]]></name>
 		<tooltip><![CDATA[Statspack]]></tooltip>
@@ -1933,7 +1014,7 @@ ORDER BY snap_time, stat_name]]></sql>
 					<bind id="days_start">
 						<prompt><![CDATA[days_start]]></prompt>
 						<tooltip><![CDATA[days_start]]></tooltip>
-						<value><![CDATA[1]]></value>
+						<value><![CDATA[8]]></value>
 						<bracket><![CDATA[null]]></bracket>
 					</bind>
 					<bind id="days_end">
@@ -1944,7 +1025,7 @@ ORDER BY snap_time, stat_name]]></sql>
 					</bind>
 				</binds>
 			</query>
-			<display id="null" type="" style="Chart" enable="true">
+			<display id="" type="" style="Chart" enable="true">
 				<name><![CDATA[IO]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2030,7 +1111,7 @@ ORDER BY snap_time, stat_name]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Chart" enable="true">
+			<display id="" type="" style="Chart" enable="true">
 				<name><![CDATA[Gets]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2114,7 +1195,7 @@ ORDER BY snap_time, stat_name DESC]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Chart" enable="true">
+			<display id="" type="" style="Chart" enable="true">
 				<name><![CDATA[Active Sessions]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2208,7 +1289,7 @@ FROM
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[Time Model]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2248,7 +1329,7 @@ SELECT tm.snap_id, sn.snap_time, nm.stat_name
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[Top Events]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2299,7 +1380,7 @@ SELECT tm.snap_id, sn.snap_time, nm.stat_name
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STATS$SHARED_POOL_ADVICE]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2321,7 +1402,7 @@ where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STATS$WAITSTAT]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2344,7 +1425,7 @@ order by stat.time desc]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Chart" enable="true">
+			<display id="" type="" style="Chart" enable="true">
 				<name><![CDATA[STATS$SGA]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2405,7 +1486,7 @@ ORDER BY time, name DESC]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STATS$DB_CACHE_ADVICE]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2427,7 +1508,7 @@ where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STATS$FILESTATXS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2449,7 +1530,7 @@ where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STATS$PARAMETER]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2472,7 +1553,7 @@ order by name]]></sql>
 					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STATS$PGA_TARGET_ADVICE]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2484,9 +1565,17 @@ order by name]]></sql>
 					<sql><![CDATA[select :TIME, stat.* 
 from stats$snapshot sn join STATS$PGA_TARGET_ADVICE stat on (sn.snap_id=stat.snap_id)
 where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+					<binds>
+						<bind id="TIME">
+							<prompt><![CDATA[TIME]]></prompt>
+							<tooltip><![CDATA[TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STATS$SQL_WORKAREA_HISTOGRAM]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -2498,6 +1587,14 @@ where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
 					<sql><![CDATA[select :TIME, stat.* 
 from stats$snapshot sn join STATS$SQL_WORKAREA_HISTOGRAM stat on (sn.snap_id=stat.snap_id)
 where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+					<binds>
+						<bind id="TIME">
+							<prompt><![CDATA[TIME]]></prompt>
+							<tooltip><![CDATA[TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 		</display>
@@ -2514,7 +1611,7 @@ where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
 from perfstat.stats$snapshot
 order by snap_time desc]]></sql>
 			</query>
-<item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="76f2db8c-018f-1000-8012-ac1900c08aaa" toolbar="false" ><title>System Statistics from Statspac</title></item>		</display>
+<item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="76f2db8c-018f-1000-8012-ac1900c08aaa" toolbar="false" ><title>System Statistics from Statspac</title><sql><![CDATA[]]></sql><script language="js"><![CDATA[]]></script><help></help></item>		</display>
 	</folder>
 	<folder>
 		<name><![CDATA[AWR]]></name>
@@ -3439,7 +2536,7 @@ SELECT SNAP_ID,
 FROM dba_hist_snapshot ORDER BY 
 SNAP_ID DESC, INSTANCE_NUMBER ASC;]]></sql>
 					</query>
-<item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="792de96c-0138-1000-803a-0a01571c53e9" toolbar="false" ><title>Generate AWR as Text</title><sql><![CDATA[]]></sql><script language="js"><![CDATA[]]></script><help></help></item><item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="7936a819-0138-1000-804e-0a01571c53e9" toolbar="false" ><title>Generate AWR as HTML</title><sql><![CDATA[]]></sql><script language="js"><![CDATA[]]></script><help></help></item>				</display>
+<item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="792de96c-0138-1000-803a-0a01571c53e9" toolbar="false" ><title>Generate AWR as Text</title></item><item  reload="false"  reloadparent="false" removeFromParent="false" className="oracle.dbtools.raptor.report.addin.DrillReportAction" classArgs="7936a819-0138-1000-804e-0a01571c53e9" toolbar="false" ><title>Generate AWR as HTML</title></item>				</display>
 				<display id="4c1e20c9-019c-1000-8040-a9fe632cd7a4" type="" style="plsql-dbms_output" enable="true">
 					<name><![CDATA[AWR Reports By Snap - Detail as HTML]]></name>
 					<description><![CDATA[]]></description>
@@ -3872,6 +2969,14 @@ ORDER BY property_name, con_id]]></sql>
 from CDB_SERVICES
 where (con_id=:CON_ID or :CON_ID is null)
 ORDER BY service_id, con_id]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -3887,6 +2992,20 @@ ORDER BY service_id, con_id]]></sql>
 from GV$SYSTEM_PARAMETER 
 where (con_id=:CON_ID or :CON_ID is null) and (inst_id=:INST_ID or :INST_ID is null)
 order by inst_id, name, con_id]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="INST_ID">
+							<prompt><![CDATA[INST_ID]]></prompt>
+							<tooltip><![CDATA[INST_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -3902,6 +3021,14 @@ order by inst_id, name, con_id]]></sql>
 from CDB_PDB_HISTORY 
 where (con_id=:CON_ID or :CON_ID is null) 
 order by pdb_name,con_id, pdb_id, op_timestamp desc]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -3944,6 +3071,14 @@ from CDB_PDB_SAVED_STATES]]></sql>
 from CDB_USERS
 where (con_id=:CON_ID or :CON_ID is null)
 order by username, con_id]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -3967,6 +3102,14 @@ order by username, con_id]]></sql>
 from CDB_OBJECTS o
 where (con_id=:CON_ID or :CON_ID is null)
 order by owner, object_name, object_id]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -3989,6 +3132,14 @@ order by owner, object_name, object_id]]></sql>
 from CDB_SEGMENTS s
 where (con_id=:CON_ID or :CON_ID is null)
 order by owner, SEGMENT_name--, object_id]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -4051,6 +3202,14 @@ left outer join (
     --  tablespace_name	
   ) b ON a.tablespace_name = b.tablespace_name and a.con_id=b.con_id
   order by a.con_id, a.tablespace_name]]></sql>
+					<binds>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
 			<display id="" type="" style="Table" enable="true">
@@ -4674,6 +3833,124 @@ http://www.vitalsofttech.com/rman-backup-async-io-rate/]]></description>
 WHERE STATUS='RUNNING'
  ORDER BY START_TIME DESC]]></sql>
 			</query>
+		</display>
+		<display id="56f0e060-019c-1000-807a-a9fe632cd7a4" type="" style="Table" enable="true">
+			<name><![CDATA[RMAN]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from v$rman_status
+order by start_time desc]]></sql>
+			</query>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[Configuration]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select *  
+from gV$RMAN_CONFIGURATION
+order by inst_id, con_id, name]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[BACKUP_JOB_DETAILS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from V$RMAN_BACKUP_JOB_DETAILS
+where (session_recid = :RECID or :RECID is null)
+  and (session_stamp = :STAMP or :STAMP is null)
+order by start_time desc]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[BACKUP_SUBJOB_DETAILS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from V$RMAN_BACKUP_SUBJOB_DETAILS
+where (session_recid = :RECID or :RECID is null)
+  and (session_stamp = :STAMP or :STAMP is null)
+order by start_time desc]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[OUTPUT]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from V$RMAN_OUTPUT
+where (session_recid = :RECID or :RECID is null)
+  and (session_stamp = :STAMP or :STAMP is null)
+order by recid]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[BACKUP_TYPE]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from V$RMAN_BACKUP_TYPE
+order by weight]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[COMPRESSION_ALGORITHM]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from V$RMAN_COMPRESSION_ALGORITHM
+order by algorithm_id]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[ENCRYPTION_ALGORITHMS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from V$RMAN_ENCRYPTION_ALGORITHMS
+order by algorithm_id]]></sql>
+				</query>
+			</display>
 		</display>
 	</folder>
 	<folder>
@@ -5640,6 +4917,391 @@ where inst_id=:INST_ID and sid = :SID and serial#=:SERIAL#]]></sql>
 				</query>
 			</display>
 		</display>
+		<display id="1a264ca7-018d-1000-8009-0abcf0220279" type="" style="Table" enable="true">
+			<name><![CDATA[SQL]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select --s.sql_id, 
+       s.* from gv$sql s
+order by sql_id, last_load_time]]></sql>
+			</query>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[CursorPlan_all]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select *
+   from 
+   table(dbms_xplan.display_cursor(:SQL_ID,
+                                  :CHILD_NUMBER, 'ALL')) t
+where :SQL_ID is not null]]></sql>
+					<binds>
+						<bind id="SQL_ID">
+							<prompt><![CDATA[SQL_ID]]></prompt>
+							<tooltip><![CDATA[SQL_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="CHILD_NUMBER">
+							<prompt><![CDATA[CHILD_NUMBER]]></prompt>
+							<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[CursorPlan_adaptive]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select *
+   from 
+   table(dbms_xplan.display_cursor(:SQL_ID,
+                                  :CHILD_NUMBER, 'ADAPTIVE')) t
+where :SQL_ID is not null]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLBindCapture]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_BIND_CAPTURE s 
+--left join GV$SQL_BIND_METADATA m on utl_raw.compare(s.address,m.address)=0
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by s.POSITION]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLCsHistogram]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_CS_HISTOGRAM s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by bucket_id]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLOptimizerEnv]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_OPTIMIZER_ENV s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by id]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLPLanStatistics]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_PLAN_STATISTICS s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+--order by id]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLPLanStatisticsAll]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_PLAN_STATISTICS_ALL s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by id]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLRedirection]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select u.username, s.* 
+from GV$SQL_REDIRECTION s join all_users u on s.PARSING_USER_ID=u.USER_ID
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER]]></sql>
+					<binds>
+						<bind id="SQL_ID">
+							<prompt><![CDATA[SQL_ID]]></prompt>
+							<tooltip><![CDATA[SQL_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="CHILD_NUMBER">
+							<prompt><![CDATA[CHILD_NUMBER]]></prompt>
+							<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLReoptimizatioHints]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_REOPTIMIZATION_HINTS s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+order by hint_id]]></sql>
+					<binds>
+						<bind id="SQL_ID">
+							<prompt><![CDATA[SQL_ID]]></prompt>
+							<tooltip><![CDATA[SQL_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="CHILD_NUMBER">
+							<prompt><![CDATA[CHILD_NUMBER]]></prompt>
+							<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLSharedCursor]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_SHARED_CURSOR s 
+where s.sql_id=:SQL_ID and s.CHILD_NUMBER=:CHILD_NUMBER
+--order by id]]></sql>
+					<binds>
+						<bind id="SQL_ID">
+							<prompt><![CDATA[SQL_ID]]></prompt>
+							<tooltip><![CDATA[SQL_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="CHILD_NUMBER">
+							<prompt><![CDATA[CHILD_NUMBER]]></prompt>
+							<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLWorkarea]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_WORKAREA s 
+where (s.sql_id=:SQL_ID  )
+--and (s.address=:ADDRESS  ) 
+and s.CHILD_NUMBER=:CHILD_NUMBER
+order by operation_id]]></sql>
+					<binds>
+						<bind id="SQL_ID">
+							<prompt><![CDATA[SQL_ID]]></prompt>
+							<tooltip><![CDATA[SQL_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="CHILD_NUMBER">
+							<prompt><![CDATA[CHILD_NUMBER]]></prompt>
+							<tooltip><![CDATA[CHILD_NUMBER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLWorkareaActive]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_WORKAREA_ACTIVE s 
+where (s.sql_id=:SQL_ID  or :SQL_ID is null)
+--and (s.address=:ADDRESS  or :ADDRESS is null)
+order by operation_id]]></sql>
+					<binds>
+						<bind id="SQL_ID">
+							<prompt><![CDATA[SQL_ID]]></prompt>
+							<tooltip><![CDATA[SQL_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLWorkareaHistogram]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQL_WORKAREA_HISTOGRAM
+order by 1,2]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLArea]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQLAREA s 
+where (s.sql_id=:SQL_ID  or :SQL_ID is null)
+and (s.address=:ADDRESS  or :ADDRESS is null)
+--order by operation_id]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLAreaPlanHash]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQLAREA_PLAN_HASH s 
+where (s.sql_id=:SQL_ID  or :SQL_ID is null)
+and (s.address=:ADDRESS  or :ADDRESS is null)
+--order by operation_id]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLStats]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQLSTATS s 
+where (s.sql_id=:SQL_ID  or :SQL_ID is null)
+and (s.address=:ADDRESS  or :ADDRESS is null)]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLStatsPlanHash]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQLSTATS_PLAN_HASH s 
+where (s.sql_id=:SQL_ID  or :SQL_ID is null)
+and (s.address=:ADDRESS  or :ADDRESS is null)]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLText]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQLTEXT s 
+where (s.sql_id=:SQL_ID  or :SQL_ID is null)
+and (s.address=:ADDRESS  or :ADDRESS is null)
+order by piece]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[SQLTextWithNewlines]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from GV$SQLTEXT_WITH_NEWLINES s 
+where (s.sql_id=:SQL_ID  or :SQL_ID is null)
+and (s.address=:ADDRESS  or :ADDRESS is null)
+order by piece]]></sql>
+				</query>
+			</display>
+		</display>
 	</folder>
 	<folder>
 		<name><![CDATA[DataGuard]]></name>
@@ -5913,7 +5575,7 @@ order by ntimestamp# desc]]></sql>
 from sys.cdb_audit_trail
 order by timestamp desc]]></sql>
 			</query>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[Parameters]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5922,10 +5584,13 @@ order by timestamp desc]]></sql>
 					<TYPE><![CDATA[horizontal]]></TYPE>
 				</CustomValues>
 				<query>
-					<sql><![CDATA[select * from gv$parameter where name like 'audit%']]></sql>
+					<sql><![CDATA[select * 
+from gv$parameter 
+where name like '%audit%'
+order by inst_id, con_id, name]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[OBJ_AUDIT_OPTS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5937,7 +5602,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[SELECT * FROM CDB_OBJ_AUDIT_OPTS]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[PRIV_AUDIT_OPTS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5949,7 +5614,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[SELECT * FROM CDB_PRIV_AUDIT_OPTS]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[STMT_AUDIT_OPTS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5961,7 +5626,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[SELECT * FROM CDB_STMT_AUDIT_OPTS]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[AUDIT_EXISTS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5973,7 +5638,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[SELECT * FROM CDB_AUDIT_EXISTS ORDER BY TIMESTAMP DESC]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[AUDIT_OBJECT]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5985,7 +5650,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[SELECT * FROM CDB_AUDIT_OBJECT ORDER BY TIMESTAMP DESC]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[AUDIT_SESSION]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -5997,7 +5662,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[SELECT * FROM CDB_AUDIT_SESSION ORDER BY TIMESTAMP DESC]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[AUDIT_STATEMENT]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -6009,7 +5674,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[SELECT * FROM CDB_AUDIT_STATEMENT ORDER BY TIMESTAMP DESC]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[AUDIT_TRAIL]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -6023,7 +5688,7 @@ from sys.cdb_audit_trail
 order by timestamp desc]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[AUDIT_ACTIONS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -6035,7 +5700,7 @@ order by timestamp desc]]></sql>
 					<sql><![CDATA[select * from AUDIT_ACTIONS order by action]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[DEF_AUDIT_OPTS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -6076,12 +5741,27 @@ order by event_timestamp desc]]></sql>
 					</bind>
 				</binds>
 			</query>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[Parameters]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from gv$parameter 
+where name like '%audit%'
+order by inst_id, con_id, name]]></sql>
+				</query>
+			</display>
 		</display>
 	</folder>
 	<folder>
 		<name><![CDATA[Redo_Archivelogs]]></name>
-		<tooltip><![CDATA[]]></tooltip>
-		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[Redo_Archivelogs]]></tooltip>
+		<description><![CDATA[ ]]></description>
 			<display id="ea0e2821-018c-1000-8031-ac120052d4bc" type="" style="plsql-dbms_output" enable="true">
 			<name><![CDATA[Log Switch Heat Map]]></name>
 			<description><![CDATA[]]></description>
@@ -6241,201 +5921,6 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."22", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."23", myMax) );
     DBMS_OUTPUT.PUT_LINE( DataCell(cur."24h", myMax) );
-    DBMS_OUTPUT.PUT_LINE('</TR>');
-  END LOOP;
-
-  DBMS_OUTPUT.PUT_LINE('</TABLE>');
-  DBMS_OUTPUT.PUT_LINE('</HTML>');
-
-
-END;]]></sql>
-			</query>
-		</display>
-		<display id="4cbb76cc-019c-1000-8066-a9fe632cd7a4" type="" style="plsql-dbms_output" enable="true">
-			<name><![CDATA[Archived Log Heat Map by Count]]></name>
-			<description><![CDATA[]]></description>
-			<tooltip><![CDATA[]]></tooltip>
-			<drillclass><![CDATA[]]></drillclass>
-			<CustomValues>
-			</CustomValues>
-			<query>
-				<sql><![CDATA[-- David Mann
--- http://ba6.us
-
--- Archived Log Heat Map for past 31 Days
--- Requires access to v$archived_log
-
--- Usage (3 possiblities):
--- o Spool output to file and view with browser 
--- o Use SQL Developer PL/SQL DBMS_OUTPUT report type
--- o Paste code into Apex PL/SQL output type and change DBMS_OUTPUT to HTP.P
-
--- I tried to use a scripted stylesheet but SQL Dev wouldn't cooperate so
--- that is my excuse for all of the ugly inline CSS. For now :) 
-
--- Date         Change
--- -----------  ---------------------------------------------------------------
--- 24-JUL-2012  Initial version
--- 25-OCT-2012  Only print max value number, trying to reduce visual complexity
--- 07-MAR-2016  Specified "By Count" as creating new version By GB of Redo
--- 08-MAR-2016 Fixed "Max" calculation to respect 31 days instead of 90
-
---SET SERVEROUTPUT ON
-DECLARE
-  myMax NUMBER;
-  myDBName VARCHAR2(16);
-
-  -- dec2hex Function from http://www.orafaq.com/wiki/Hexadecimal
-  FUNCTION dec2hex (N in number) RETURN varchar2 IS
-    hexval varchar2(64);
-    N2     number := N;
-    digit  number;
-    hexdigit  char;
-  BEGIN
-    while ( N2 > 0 ) loop
-       digit := mod(N2, 16);
-       if digit > 9 then 
-         hexdigit := chr(ascii('A') + digit - 10);
-       else
-         hexdigit := to_char(digit);
-       end if;
-       hexval := hexdigit || hexval;
-       N2 := trunc( N2 / 16 );
-    end loop;
-    return hexval;
-  END dec2hex;
-
-  FUNCTION DataCell ( P_Value NUMBER, P_Max NUMBER) RETURN VARCHAR2 IS
-   myReturn VARCHAR2(128);
-   myColorVal NUMBER;
-   myColorHex VARCHAR2(16);
-  BEGIN
-
-    myColorVal := ROUND( 255-FLOOR(255 * (P_VALUE / P_MAX)));
-    myColorHex := LPAD(TRIM(dec2hex(myColorVal)) ,2,'0');
-    
-    IF P_Value = P_Max THEN
-      myColorHex := '00';
-    END IF;
-    
-
-    myReturn := '<TD STYLE="background-color: #FF'||
-                myColorHex||
-                myColorHex||
-                '; font-family: monospace">';
-    -- Only show max number to show relative peak
-    -- Wanted to reduce visual complexity of map by removing the sea of #'s
-    --IF P_Value = P_Max THEN
-      myReturn := myReturn ||P_Value;
-    --END IF;
-    myReturn := myReturn ||'</TD>';
-
-
-    RETURN myReturn;
-  END DataCell;
-
-BEGIN
-
-  DBMS_OUTPUT.ENABLE(100000);
-
-  SELECT ROUND(MAX(COUNT(*)))
-    INTO myMax
-    FROM v$log_history 
-    WHERE trunc(FIRST_TIME) >= trunc(sysdate - 31)
-  GROUP BY TO_CHAR(first_time,'YYYY-MM-DD HH24');
-  
-  SELECT NAME INTO myDBName FROM V$DATABASE;
-
-  DBMS_OUTPUT.PUT_LINE('<HTML>');
-  DBMS_OUTPUT.PUT_LINE('<H1>Archived Log Count Heat Map by - '||myDBName||'  - Past 31 days</H1>');
-  DBMS_OUTPUT.PUT_LINE('<TABLE>');
-  DBMS_OUTPUT.PUT_LINE('<TR>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">Date / Hour</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">00</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">01</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">02</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">03</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">04</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">05</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">06</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">07</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">08</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">09</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">10</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">11</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">12</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">13</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">14</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">15</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">16</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">17</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">18</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">19</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">20</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">21</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">22</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">23</TD>');
-  DBMS_OUTPUT.PUT_LINE('<TR>');
-
-  FOR cur IN (
-
-    select trunc(first_time) AS Day,
-    sum(DECODE(to_char(first_time, 'HH24'), '00', 1, 0)) AS "00",
-    sum(DECODE(to_char(first_time, 'HH24'), '01', 1, 0)) AS "01",
-    sum(DECODE(to_char(first_time, 'HH24'), '02', 1, 0)) AS "02",
-    sum(DECODE(to_char(first_time, 'HH24'), '03', 1, 0)) AS "03",
-    sum(DECODE(to_char(first_time, 'HH24'), '04', 1, 0)) AS "04",
-    sum(DECODE(to_char(first_time, 'HH24'), '05', 1, 0)) AS "05",
-    sum(DECODE(to_char(first_time, 'HH24'), '06', 1, 0)) AS "06",
-    sum(DECODE(to_char(first_time, 'HH24'), '07', 1, 0)) AS "07",
-    sum(DECODE(to_char(first_time, 'HH24'), '08', 1, 0)) AS "08",
-    sum(DECODE(to_char(first_time, 'HH24'), '09', 1, 0)) AS "09",
-    sum(DECODE(to_char(first_time, 'HH24'), '10', 1, 0)) AS "10",
-    sum(DECODE(to_char(first_time, 'HH24'), '11', 1, 0)) AS "11",
-    sum(DECODE(to_char(first_time, 'HH24'), '12', 1, 0)) AS "12",
-    sum(DECODE(to_char(first_time, 'HH24'), '13', 1, 0)) AS "13",
-    sum(DECODE(to_char(first_time, 'HH24'), '14', 1, 0)) AS "14",
-    sum(DECODE(to_char(first_time, 'HH24'), '15', 1, 0)) AS "15",
-    sum(DECODE(to_char(first_time, 'HH24'), '16', 1, 0)) AS "16",
-    sum(DECODE(to_char(first_time, 'HH24'), '17', 1, 0)) AS "17",
-    sum(DECODE(to_char(first_time, 'HH24'), '18', 1, 0)) AS "18",
-    sum(DECODE(to_char(first_time, 'HH24'), '19', 1, 0)) AS "19",
-    sum(DECODE(to_char(first_time, 'HH24'), '20', 1, 0)) AS "20",
-    sum(DECODE(to_char(first_time, 'HH24'), '21', 1, 0)) AS "21",
-    sum(DECODE(to_char(first_time, 'HH24'), '22', 1, 0)) AS "22",
-    sum(DECODE(to_char(first_time, 'HH24'), '23', 1, 0)) AS "23"
-    FROM v$log_history
-    WHERE trunc(FIRST_TIME) >= trunc(sysdate - 31)
-    GROUP BY trunc(first_time)
-    ORDER BY TRUNC(FIRST_TIME) DESC
-  )
-  LOOP
-    DBMS_OUTPUT.PUT_LINE('<TR>');
-    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||TO_CHAR(cur.Day,'DD-MON-YYYY')||'<EM></TD>');
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."00", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."01", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."02", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."03", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."04", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."05", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."06", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."07", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."08", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."09", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."10", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."11", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."12", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."13", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."14", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."15", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."16", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."17", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."18", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."19", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."20", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."21", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."22", myMax) );
-    DBMS_OUTPUT.PUT_LINE( DataCell(cur."23", myMax) );
     DBMS_OUTPUT.PUT_LINE('</TR>');
   END LOOP;
 
@@ -6814,8 +6299,8 @@ ORDER BY 1 DESC ;]]></sql>
 	</folder>
 	<folder>
 		<name><![CDATA[Configuration]]></name>
-		<tooltip><![CDATA[]]></tooltip>
-		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[Configuration]]></tooltip>
+		<description><![CDATA[ ]]></description>
 			<display id="1c15bfd6-018d-1000-8001-c0a838012ded" type="" style="Table" enable="true">
 			<name><![CDATA[Diagnostic]]></name>
 			<description><![CDATA[]]></description>
@@ -7179,11 +6664,559 @@ order by inst_id,service_name, begin_time desc]]></sql>
 				</query>
 			</display>
 		</display>
+		<display id="e9970c1f-018c-1000-802d-ac120052d4bc" type="" style="Table" enable="true">
+			<name><![CDATA[Scheduler]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select 
+'SQLDEV:LINK:'
+       || owner
+       || ':'
+       || 'SCHNEWJOB' -- object_type
+       || ':'
+       || job_name
+       || ':'||job_name||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS details,
+j.*,
+'exec DBMS_SCHEDULER.enable(name=>''"'||owner||'"."'||job_name||'"'');' enable_job,
+'exec DBMS_SCHEDULER.disable(name=>''"'||owner||'"."'||job_name||'"'', force => TRUE);' disable_job,
+'exec DBMS_SCHEDULER.RUN_JOB(name=>''"'||owner||'"."'||job_name||'"'', USE_CURRENT_SESSION => FALSE);' run_job,
+'exec DBMS_SCHEDULER.STOP_JOB(job_name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE);' stop_job,
+'exec DBMS_SCHEDULER.DROP_JOB(name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE, defer => TRUE);' drop_job
+from cdb_scheduler_jobs j
+order by owner, job_name]]></sql>
+			</query>
+			<query>
+				<sql><![CDATA[select 
+'SQLDEV:LINK:'
+       || owner
+       || ':'
+       || 'SCHNEWJOB' -- object_type
+       || ':'
+       || job_name
+       || ':'||job_name||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS details,
+j.*,
+'exec DBMS_SCHEDULER.enable(name=>''"'||owner||'"."'||job_name||'"'');' enable_job,
+'exec DBMS_SCHEDULER.disable(name=>''"'||owner||'"."'||job_name||'"'', force => TRUE);' disable_job,
+'exec DBMS_SCHEDULER.RUN_JOB(name=>''"'||owner||'"."'||job_name||'"'', USE_CURRENT_SESSION => FALSE);' run_job,
+'exec DBMS_SCHEDULER.STOP_JOB(job_name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE);' stop_job,
+'exec DBMS_SCHEDULER.DROP_JOB(name=>''"'||owner||'"."'||job_name||'"'',  force => TRUE, defer => TRUE);' drop_job
+from dba_scheduler_jobs j
+order by owner, job_name]]></sql>
+			</query>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[Running jobs]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from cdb_SCHEDULER_RUNNING_JOBS
+--where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
+order by owner, job_name]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[Job run details]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from cdb_SCHEDULER_JOB_RUN_DETAILS
+where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
+  and (CON_ID=:CON_ID)
+order by LOG_ID desc --,LOG_DATE desc]]></sql>
+					<binds>
+						<bind id="OWNER">
+							<prompt><![CDATA[OWNER]]></prompt>
+							<tooltip><![CDATA[OWNER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="JOB_NAME">
+							<prompt><![CDATA[JOB_NAME]]></prompt>
+							<tooltip><![CDATA[JOB_NAME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[Job log]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from CDB_SCHEDULER_JOB_LOG
+where ((OWNER=:OWNER and JOB_name=:JOB_NAME) or (:OWNER is null and :JOB_NAME is null))
+  and (CON_ID=:CON_ID)
+order by LOG_ID desc --,LOG_DATE desc]]></sql>
+					<binds>
+						<bind id="OWNER">
+							<prompt><![CDATA[OWNER]]></prompt>
+							<tooltip><![CDATA[OWNER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="JOB_NAME">
+							<prompt><![CDATA[JOB_NAME]]></prompt>
+							<tooltip><![CDATA[JOB_NAME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[Global attribute]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from DBA_SCHEDULER_GLOBAL_ATTRIBUTE
+order by ATTRIBUTE_NAME]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[Instance parameters]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[SELECT * FROM GV$PARAMETER
+--where 
+--name like 'job%'
+order by isdefault, name]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Chart" enable="true">
+				<name><![CDATA[Job duration and CPU]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<Y1AXIS_TITLE_TEXT><![CDATA[[s]]]></Y1AXIS_TITLE_TEXT>
+					<PLOT_HGRID_WIDTH><![CDATA[THINNER]]></PLOT_HGRID_WIDTH>
+					<Y1AXIS_SCALE_INCREMENT><![CDATA[10.0]]></Y1AXIS_SCALE_INCREMENT>
+					<Y2AXIS_SCALE_MAXIMUM><![CDATA[80.0]]></Y2AXIS_SCALE_MAXIMUM>
+					<Y1AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y1AXIS_LINE_WIDTH>
+					<Y1AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y1AXIS_TITLE_ALIGNMENT>
+					<LEGEND_LOCATION><![CDATA[AUTOMATIC]]></LEGEND_LOCATION>
+					<Y1AXIS_REFOBJ_COUNT><![CDATA[0]]></Y1AXIS_REFOBJ_COUNT>
+					<LEGEND_ALIGNMENT><![CDATA[LEFT]]></LEGEND_ALIGNMENT>
+					<XAXIS_LINE_WIDTH><![CDATA[THINNEST]]></XAXIS_LINE_WIDTH>
+					<Y1AXIS_REFOBJ_LINE_VALUE><![CDATA[\]]></Y1AXIS_REFOBJ_LINE_VALUE>
+					<DATA_MAP_COLUMNS><![CDATA[\,"ACTUAL_START_DATE","ACTUAL_START_DATE",]]></DATA_MAP_COLUMNS>
+					<Y1AXIS_SCALE_MAXIMUM><![CDATA[60.0]]></Y1AXIS_SCALE_MAXIMUM>
+					<XAXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></XAXIS_TITLE_ALIGNMENT>
+					<XAXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></XAXIS_TICK_LABEL_ROTATE>
+					<Y1AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y1AXIS_LOGARITHMIC_BASE>
+					<TYPE><![CDATA[LINE_VERT_ABS]]></TYPE>
+					<GRID_WIDTH><![CDATA[THINNER]]></GRID_WIDTH>
+					<PLOT_DATALABELS_BAR_POSITION><![CDATA[ABOVE]]></PLOT_DATALABELS_BAR_POSITION>
+					<FOOTNOTE_ALIGNMENT><![CDATA[LEFT]]></FOOTNOTE_ALIGNMENT>
+					<XAXIS_TICK_LABEL_SKIP_MODE><![CDATA[AUTOMATIC]]></XAXIS_TICK_LABEL_SKIP_MODE>
+					<Y1AXIS_REFOBJ_VISIBLE><![CDATA[\]]></Y1AXIS_REFOBJ_VISIBLE>
+					<DATA_MAP_COLNAMES><![CDATA[\,"ACTUAL_START_DATE","ADDITIONAL_INFO","BINARY_ERRORS","BINARY_OUTPUT","CPU_USED","CPU_USED_SEC","CREDENTIAL_NAME","CREDENTIAL_OWNER","DESTINATION","DESTINATION_OWNER","ERROR#","ERRORS","INSTANCE_ID","JOB_NAME","JOB_SUBNAME","LOG_DATE","LOG_ID","OUTPUT","OWNER","REQ_START_DATE","RUN_DURATION","RUN_DURATION_SEC","SESSION_ID","SLAVE_PID","STATUS"]]></DATA_MAP_COLNAMES>
+					<DATA_MAP_SERIES><![CDATA[\,DURATION,CPU,]]></DATA_MAP_SERIES>
+					<Y2AXIS_LOGARITHMIC_BASE><![CDATA[BASE_10]]></Y2AXIS_LOGARITHMIC_BASE>
+					<DATA_MAP_COUNT><![CDATA[3]]></DATA_MAP_COUNT>
+					<STYLE><![CDATA[Default]]></STYLE>
+					<TITLE_ALIGNMENT><![CDATA[LEFT]]></TITLE_ALIGNMENT>
+					<Y2AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y2AXIS_TICK_LABEL_ROTATE>
+					<Y2AXIS_SCALE_MINIMUM><![CDATA[10.0]]></Y2AXIS_SCALE_MINIMUM>
+					<XAXIS_TITLE><![CDATA[false]]></XAXIS_TITLE>
+					<Y2AXIS_LINE_WIDTH><![CDATA[THINNEST]]></Y2AXIS_LINE_WIDTH>
+					<DATA_MAP_VALUES><![CDATA[\,"RUN_DURATION_SEC","CPU_USED_SEC",]]></DATA_MAP_VALUES>
+					<Y1AXIS_TICK_LABEL_ROTATE><![CDATA[HORIZONTAL]]></Y1AXIS_TICK_LABEL_ROTATE>
+					<Y1AXIS_REFOBJ_TEXT><![CDATA[\]]></Y1AXIS_REFOBJ_TEXT>
+					<Y1AXIS_REFOBJ_WIDTH><![CDATA[\]]></Y1AXIS_REFOBJ_WIDTH>
+					<Y1AXIS_TITLE><![CDATA[true]]></Y1AXIS_TITLE>
+					<Y2AXIS_SCALE_INCREMENT><![CDATA[20.0]]></Y2AXIS_SCALE_INCREMENT>
+					<PLOT_VGRID_WIDTH><![CDATA[THINNER]]></PLOT_VGRID_WIDTH>
+					<Y2AXIS_TITLE_ALIGNMENT><![CDATA[CENTER]]></Y2AXIS_TITLE_ALIGNMENT>
+					<SUBTITLE_ALIGNMENT><![CDATA[LEFT]]></SUBTITLE_ALIGNMENT>
+					<Y1AXIS_REFOBJ_COLOR><![CDATA[\]]></Y1AXIS_REFOBJ_COLOR>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select j.*, 
+abs( extract( second from RUN_DURATION ) 
+          + extract( minute from RUN_DURATION ) * 60 
+          + extract( hour from RUN_DURATION ) * 60 * 60 
+          + extract( day from RUN_DURATION ) * 60 * 60 * 24
+            ) as RUN_DURATION_SEC,
+abs( extract( second from CPU_USED ) 
+          + extract( minute from CPU_USED ) * 60 
+          + extract( hour from CPU_USED ) * 60 * 60 
+          + extract( day from CPU_USED ) * 60 * 60 * 24
+            ) as CPU_USED_SEC
+from DBA_SCHEDULER_JOB_RUN_DETAILS j
+where 
+  (OWNER=:OWNER and JOB_name=:JOB_NAME) 
+order by LOG_DATE]]></sql>
+					<binds>
+						<bind id="OWNER">
+							<prompt><![CDATA[OWNER]]></prompt>
+							<tooltip><![CDATA[OWNER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="JOB_NAME">
+							<prompt><![CDATA[JOB_NAME]]></prompt>
+							<tooltip><![CDATA[JOB_NAME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[AutoTasks]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select a.* ,
+'exec DBMS_AUTO_TASK_ADMIN.ENABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as enable,
+'exec DBMS_AUTO_TASK_ADMIN.DISABLE (client_name  => '''||client_name||''', operation    => NULL, window_name  => NULL);' as disable
+from DBA_AUTOTASK_CLIENT a]]></sql>
+				</query>
+			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[AutoStatsExecutions]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from DBA_AUTO_STAT_EXECUTIONS]]></sql>
+				</query>
+			</display>
+		</display>
+		<display id="36acad05-018d-1000-800f-ac19014670d5" type="" style="Table" enable="true">
+			<name><![CDATA[Users]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select 
+'SQLDEV:LINK:'
+       || username
+       || ':'
+       || 'USER' -- object_type
+       || ':'
+       || username
+       || ':'||username||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' AS details,
+u.*, 
+  'alter user "'||u.username||'" PASSWORD EXPIRE ACCOUNT LOCK;' as lock_account, 
+  'alter user "'||u.username||'" ACCOUNT UNLOCK;' as unlock_account,
+  'alter user "'||u.username||'" identified by "'||replace(dbms_random.string('a', 14), ' ', 'x')||'";' as change_password,
+  'alter session set current_schema = "'||u.username||'";' as change_schema,
+  'alter user "'||u.username||'" default tablespace <TBS NAME>;' change_tablespace,
+  'alter user "'||u.username||'" default temporary tablespace <TEMP NAME>;' change_temp_tablespace,
+  'DROP USER "'||u.username||'" CASCADE;' as drop_user
+from cdb_users u
+order by username, con_id]]></sql>
+			</query>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[UserProfile]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from dba_profiles
+where profile=:PROFILE or :PROFILE is null
+order by profile, resource_type, resource_name]]></sql>
+					<binds>
+						<bind id="PROFILE">
+							<prompt><![CDATA[PROFILE]]></prompt>
+							<tooltip><![CDATA[PROFILE]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+				<query>
+					<sql><![CDATA[select * 
+from cdb_profiles
+where ((profile=:PROFILE or :PROFILE is null) and (CON_ID=:CON_ID or :CON_ID is null))
+order by profile, resource_type, resource_name, CON_ID]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[ObjectPrivileges]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from DBA_TAB_PRIVS
+where grantee=:USERNAME or :USERNAME is null
+order by grantee, owner, table_name, privilege]]></sql>
+				</query>
+				<query>
+					<sql><![CDATA[select * 
+from cdb_TAB_PRIVS
+where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
+order by grantee, owner, table_name, privilege, con_id]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[SystemPrivileges]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from DBA_SYS_PRIVS
+where grantee=:USERNAME or :USERNAME is null
+order by grantee, privilege]]></sql>
+				</query>
+				<query>
+					<sql><![CDATA[select * 
+from cdb_SYS_PRIVS
+where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
+order by grantee, privilege, con_id]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[Roles]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from DBA_ROLE_PRIVS
+where grantee=:USERNAME or :USERNAME is null
+order by grantee, granted_role]]></sql>
+				</query>
+				<query>
+					<sql><![CDATA[select * 
+from cdb_ROLE_PRIVS
+where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null)) 
+order by grantee, granted_role, con_id]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[All Privileges]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select
+  lpad(' ', 2*level) || granted_role "User, his roles and privileges"
+from
+  (
+  /* THE USERS */
+    select 
+      null     grantee, 
+      username granted_role
+    from 
+      cdb_users where ((username=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID is null))
+  /* THE ROLES TO ROLES RELATIONS */ 
+  union
+    select 
+      grantee,
+      granted_role
+    from
+      cdb_role_privs
+    where
+      (CON_ID=:CON_ID or :CON_ID is null)
+  /* THE ROLES TO PRIVILEGE RELATIONS */ 
+  union
+    select
+      grantee,
+      privilege
+    from
+      cdb_sys_privs
+    where 
+    (CON_ID=:CON_ID or :CON_ID is null)
+  )
+start with grantee is null
+connect by grantee = prior granted_role]]></sql>
+				</query>
+				<query>
+					<sql><![CDATA[select
+  lpad(' ', 2*level) || granted_role "User, his roles and privileges"
+from
+  (
+  /* THE USERS */
+    select 
+      null     grantee, 
+      username granted_role
+    from 
+      dba_users where (username=:USERNAME or :USERNAME is null) 
+  /* THE ROLES TO ROLES RELATIONS */ 
+  union
+    select 
+      grantee,
+      granted_role
+    from
+      dba_role_privs
+  /* THE ROLES TO PRIVILEGE RELATIONS */ 
+  union
+    select
+      grantee,
+      privilege
+    from
+      dba_sys_privs
+  )
+start with grantee is null
+connect by grantee = prior granted_role]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[UserObjects]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select 
+'SQLDEV:LINK:'
+     ||owner
+     ||':'
+     ||object_type
+     ||':'
+     ||object_name
+     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
+     o.* 
+from CDB_OBJECTS o
+where (con_id=:CON_ID or :CON_ID is null) and owner=:USERNAME
+order by owner, object_name, object_id]]></sql>
+				</query>
+				<query>
+					<sql><![CDATA[select 
+'SQLDEV:LINK:'
+     ||owner
+     ||':'
+     ||object_type
+     ||':'
+     ||object_name
+     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
+     o.* 
+from dba_OBJECTS o
+where owner=:USERNAME
+order by owner, object_name, object_id]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[UserSegments]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select 'SQLDEV:LINK:'
+     ||owner
+     ||':'
+     ||segment_type
+     ||':'
+     ||segment_name
+     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
+     s.* 
+from CDB_SEGMENTS s
+where (con_id=:CON_ID or :CON_ID is null) and owner=:USERNAME
+order by owner, SEGMENT_name--, object_id]]></sql>
+				</query>
+				<query>
+					<sql><![CDATA[select 'SQLDEV:LINK:'
+     ||owner
+     ||':'
+     ||segment_type
+     ||':'
+     ||segment_name
+     ||':oracle.dbtools.raptor.controls.grid.DefaultDrillLink' details,
+     s.* 
+from dba_SEGMENTS s
+where owner=:USERNAME
+order by owner, SEGMENT_name--, object_id]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[PwfileUsers]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select *
+from gv$pwfile_users
+order by inst_id, con_id, username]]></sql>
+				</query>
+			</display>
+		</display>
 	</folder>
 	<folder>
 		<name><![CDATA[Storage]]></name>
-		<tooltip><![CDATA[]]></tooltip>
-		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[Storage]]></tooltip>
+		<description><![CDATA[ ]]></description>
 			<display id="e925b2bd-018c-1000-800d-ac120052d4bc" type="" style="Table" enable="true">
 			<name><![CDATA[ASM]]></name>
 			<description><![CDATA[]]></description>
@@ -7412,7 +7445,7 @@ SELECT 'Controlfiles' typ, null, 'Controlfile' Tablespace_LogGroup, ROUND( BLOCK
 GROUP BY ROLLUP(typ, con_id, Tablespace_LogGroup)
 order by typ, con_id, Tablespace_LogGroup, GB desc]]></sql>
 			</query>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[DataFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7441,7 +7474,7 @@ where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) a
 ORDER BY CON_ID, TABLESPACE_NAME, FILE_ID]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[TempFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7462,7 +7495,7 @@ where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) a
 ORDER BY con_id, TABLESPACE_NAME, FILE_ID]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[LogGroups]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7477,7 +7510,7 @@ where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUM
 ORDER BY group#, thread#]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[LogFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7492,7 +7525,7 @@ where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUM
 ORDER BY group#, MEMBER]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="plsql-dbms_output" enable="true">
+			<display id="" type="" style="plsql-dbms_output" enable="true">
 				<name><![CDATA[LogSwitchHeatMap]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7658,7 +7691,7 @@ BEGIN
 END;]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[LogSwitchHistory]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7672,7 +7705,7 @@ from gv$log_history
 order by sequence# desc]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[ArchivedLogs]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7686,7 +7719,7 @@ GV$ARCHIVED_LOG
 order by recid desc]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[ControlFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7700,7 +7733,7 @@ order by recid desc]]></sql>
 ORDER by name]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[DiagTraceFile]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7713,7 +7746,7 @@ ORDER by name]]></sql>
 from GV$DIAG_TRACE_FILE]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[Tablespaces]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7744,7 +7777,7 @@ from cdb_tablespaces ts
 order by ts.con_id, ts.tablespace_name]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[TablespacesSizing]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7776,7 +7809,7 @@ GROUP BY m.con_id, m.tablespace_name
 order by 1,2]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[FreeUsedSpace]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7815,7 +7848,7 @@ order by 1,2]]></sql>
  order by 1,2]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[TablespaceMap]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7834,7 +7867,7 @@ order by 1,2]]></sql>
  order by file_id, first_block desc]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[Segments]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7849,7 +7882,7 @@ order by 1,2]]></sql>
  order by bytes desc]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[FilesToResize]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
