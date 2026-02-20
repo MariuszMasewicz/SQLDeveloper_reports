@@ -1014,7 +1014,7 @@ ORDER BY snap_time, stat_name]]></sql>
 					<bind id="days_start">
 						<prompt><![CDATA[days_start]]></prompt>
 						<tooltip><![CDATA[days_start]]></tooltip>
-						<value><![CDATA[8]]></value>
+						<value><![CDATA[10]]></value>
 						<bracket><![CDATA[null]]></bracket>
 					</bind>
 					<bind id="days_end">
@@ -6962,7 +6962,7 @@ u.*,
 from cdb_users u
 order by username, con_id]]></sql>
 			</query>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[UserProfile]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -6991,7 +6991,7 @@ where ((profile=:PROFILE or :PROFILE is null) and (CON_ID=:CON_ID or :CON_ID is 
 order by profile, resource_type, resource_name, CON_ID]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[ObjectPrivileges]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7012,7 +7012,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, owner, table_name, privilege, con_id]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[SystemPrivileges]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7033,7 +7033,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, privilege, con_id]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[Roles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7054,7 +7054,7 @@ where ((grantee=:USERNAME or :USERNAME is null) and (CON_ID=:CON_ID or :CON_ID i
 order by grantee, granted_role, con_id]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[All Privileges]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7125,7 +7125,7 @@ start with grantee is null
 connect by grantee = prior granted_role]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[UserObjects]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7162,7 +7162,7 @@ where owner=:USERNAME
 order by owner, object_name, object_id]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[UserSegments]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7197,7 +7197,7 @@ where owner=:USERNAME
 order by owner, SEGMENT_name--, object_id]]></sql>
 				</query>
 			</display>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[PwfileUsers]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -8366,6 +8366,37 @@ order by con_id, owner, segment_name, partition_name]]></sql>
 							<bracket><![CDATA[null]]></bracket>
 						</bind>
 					</binds>
+				</query>
+			</display>
+		</display>
+	</folder>
+	<folder>
+		<name><![CDATA[Data Pump]]></name>
+		<tooltip><![CDATA[]]></tooltip>
+		<description><![CDATA[]]></description>
+			<display id="7bd9865a-019c-1000-8001-ac19017ddfb0" type="" style="Table" enable="true">
+			<name><![CDATA[Data Pump Jobs]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+				<TYPE><![CDATA[horizontal]]></TYPE>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[select * 
+from CDB_DATAPUMP_JOBS]]></sql>
+			</query>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[DATAPUMP_SESSIONS]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select * 
+from CDB_DATAPUMP_SESSIONS]]></sql>
 				</query>
 			</display>
 		</display>
