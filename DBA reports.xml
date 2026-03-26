@@ -1597,6 +1597,28 @@ where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
 					</binds>
 				</query>
 			</display>
+			<display id="" type="" style="Table" enable="true">
+				<name><![CDATA[STATS$SQL_SUMMARY]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[select :TIME, stat.* 
+from stats$snapshot sn join STATS$SQL_SUMMARY stat on (sn.snap_id=stat.snap_id)
+where TO_CHAR( snap_time, 'YYYY-MM-DD hh24:mi' ) = :TIME]]></sql>
+					<binds>
+						<bind id="TIME">
+							<prompt><![CDATA[TIME]]></prompt>
+							<tooltip><![CDATA[TIME]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
+				</query>
+			</display>
 		</display>
 		<display id="4c3397df-019c-1000-804a-a9fe632cd7a4" type="" style="Table" enable="true">
 			<name><![CDATA[Snapshots]]></name>
@@ -3396,7 +3418,7 @@ order by TIME, nlssort(WAIT_CLASS, 'nls_sort=BINARY')]]></sql>
 					<bind id="start_hours">
 						<prompt><![CDATA[start_hours]]></prompt>
 						<tooltip><![CDATA[start_hours]]></tooltip>
-						<value><![CDATA[30]]></value>
+						<value><![CDATA[1800]]></value>
 						<bracket><![CDATA[null]]></bracket>
 					</bind>
 					<bind id="end_hours">
@@ -5763,7 +5785,7 @@ order by inst_id, con_id, name]]></sql>
 		<tooltip><![CDATA[Redo_Archivelogs]]></tooltip>
 		<description><![CDATA[ ]]></description>
 			<display id="ea0e2821-018c-1000-8031-ac120052d4bc" type="" style="plsql-dbms_output" enable="true">
-			<name><![CDATA[Log Switch Heat Map]]></name>
+			<name><![CDATA[Log Switch Heat Map - number of switches]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
 			<drillclass><![CDATA[]]></drillclass>
@@ -6294,6 +6316,175 @@ FROM v$archived_log
 GROUP BY TRUNC(COMPLETION_TIME,'HH'),
   THREAD#
 ORDER BY 1 DESC ;]]></sql>
+			</query>
+		</display>
+		<display id="2ad06896-019d-1000-8004-ac1901a55cd2" type="" style="plsql-dbms_output" enable="true">
+			<name><![CDATA[Log Switch Heat Map - gigabytes]]></name>
+			<description><![CDATA[]]></description>
+			<tooltip><![CDATA[]]></tooltip>
+			<drillclass><![CDATA[]]></drillclass>
+			<CustomValues>
+			</CustomValues>
+			<query>
+				<sql><![CDATA[-- David Mann
+-- http://ba6.us
+-- 24-JUL-2012
+
+-- Archived Log Heat Map for past 31 Days
+-- Requires access to v$archived_log
+-- Spool output to file and view with browser 
+-- or use SQL Developer PL/SQL DBMS_OUTPUT report type
+
+-- I tried to use a scripted stylesheet but SQL Dev wouldn't cooperate so
+-- that is my excuse for all of the ugly inline CSS. For now :) 
+
+DECLARE
+  -- How many days of log history to show?
+  myHist CONSTANT NUMBER := 31;
+  ----------------------------------------
+  myMax NUMBER;
+  myDBName VARCHAR2(16);
+  myInstanceName VARCHAR2(100);
+  myHostName VARCHAR2(100);
+
+  FUNCTION DataCell ( P_Value NUMBER, P_Max NUMBER) RETURN VARCHAR2 IS
+   myReturn VARCHAR2(128);
+   myColorVal NUMBER;
+   myColorHex VARCHAR2(16);
+  BEGIN
+
+    myColorVal := ROUND( 255-FLOOR(255 * (P_VALUE / P_MAX)));
+    myColorHex := LPAD(TRIM(TO_CHAR(myColorVal, 'XX')) ,2,'0');
+    
+    IF P_Value = P_Max THEN
+      myColorHex := '00';
+    END IF;
+    
+
+    myReturn := '<TD STYLE="background-color: #FF'||
+                myColorHex||
+                myColorHex||
+                '; font-family: monospace">'||P_Value||'</TD>';
+
+
+    RETURN myReturn;
+  END DataCell;
+
+BEGIN
+
+  DBMS_OUTPUT.ENABLE(1000000);
+
+  SELECT ROUND(MAX(sum(a.blocks*a.block_size))/1024/1024/1024)
+    INTO myMax
+    FROM v$archived_log a 
+  WHERE trunc(FIRST_TIME) >= trunc(sysdate - myHist)
+  GROUP BY TO_CHAR(first_time,'YYYY-MM-DD HH24');
+  
+  SELECT NAME INTO myDBName FROM V$DATABASE;
+  SELECT INSTANCE_NAME, HOST_NAME INTO myInstanceName, myHostName FROM V$INSTANCE;
+
+  DBMS_OUTPUT.PUT_LINE('<HTML>');
+  DBMS_OUTPUT.PUT_LINE('<H1>Archived Log Heat Map - Past '||myHist||' days</H1>');
+  DBMS_OUTPUT.PUT_LINE('<P>Host: '||myHostName||' Database : '||myDBName||' Instance: '||myInstanceName||'</P>');
+  DBMS_OUTPUT.PUT_LINE('<TABLE>');
+  DBMS_OUTPUT.PUT_LINE('<TR>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">Date / Hour</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">00GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">01GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">02GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">03GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">04GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">05GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">06GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">07GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">08GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">09GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">10GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">11GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">12GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">13GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">14GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">15GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">16GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">17GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">18GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">19GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">20GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">21GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">22GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">23GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TD STYLE="font-family: monospace; font-weight: bold; background-color:#DEDEDE">0-24GB</TD>');
+  DBMS_OUTPUT.PUT_LINE('<TR>');
+
+  FOR cur IN (
+
+    select trunc(l.first_time) AS Day,
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '00', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "00GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '01', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "01GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '02', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "02GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '03', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "03GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '04', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "04GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '05', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "05GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '06', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "06GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '07', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "07GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '08', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "08GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '09', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "09GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '10', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "10GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '11', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "11GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '12', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "12GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '13', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "13GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '14', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "14GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '15', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "15GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '16', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "16GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '17', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "17GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '18', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "18GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '19', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "19GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '20', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "20GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '21', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "21GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '22', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "22GB",
+    round(sum(DECODE(to_char(l.first_time, 'HH24'), '23', (a.blocks*a.block_size), 0))/1024/1024/1024,2) AS "23GB",
+    round(sum(a.blocks*a.block_size)/1024/1024/1024,2) AS "24hGB"
+    FROM v$log_history l left join v$archived_log a on (l.thread#=a.thread# and l.sequence#=a.sequence#)
+    WHERE trunc(l.FIRST_TIME) >= trunc(sysdate - myHist)
+    GROUP BY trunc(l.first_time)
+    ORDER BY TRUNC(l.FIRST_TIME) DESC
+  )
+  LOOP
+    DBMS_OUTPUT.PUT_LINE('<TR>');
+    DBMS_OUTPUT.PUT_LINE('<TD style="font-family: monospace; font-weight: bold; background-color:#DEDEDE">'||TO_CHAR(cur.Day,'YYYY-MM-DD:D')||'<EM></TD>');
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."00GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."01GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."02GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."03GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."04GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."05GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."06GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."07GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."08GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."09GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."10GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."11GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."12GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."13GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."14GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."15GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."16GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."17GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."18GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."19GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."20GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."21GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."22GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."23GB", myMax) );
+    DBMS_OUTPUT.PUT_LINE( DataCell(cur."24hGB", myMax) );
+    DBMS_OUTPUT.PUT_LINE('</TR>');
+  END LOOP;
+
+  DBMS_OUTPUT.PUT_LINE('</TABLE>');
+  DBMS_OUTPUT.PUT_LINE('</HTML>');
+
+
+END;]]></sql>
 			</query>
 		</display>
 	</folder>
@@ -7233,7 +7424,7 @@ d.*
 from gv$asm_diskgroup d
 order by inst_id, group_number]]></sql>
 			</query>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Disks]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7261,7 +7452,7 @@ where (a.GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null) and (a.inst_id=:IN
 					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Files]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7273,10 +7464,25 @@ where (a.GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null) and (a.inst_id=:IN
 					<sql><![CDATA[select * 
 from gv$asm_alias a join gv$asm_file f on a.file_number=f.file_number and a.inst_id=f.inst_id and a.GROUP_NUMBER=f.GROUP_NUMBER
 where (a.GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null ) 
+and (a.INST_ID=:INST_ID or :INST_ID is null )
 order by bytes desc, a.name, a.inst_id]]></sql>
+					<binds>
+						<bind id="GROUP_NUMBER">
+							<prompt><![CDATA[GROUP_NUMBER]]></prompt>
+							<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+						<bind id="INST_ID">
+							<prompt><![CDATA[INST_ID]]></prompt>
+							<tooltip><![CDATA[INST_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
+					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Disk stats]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7288,17 +7494,9 @@ order by bytes desc, a.name, a.inst_id]]></sql>
 					<sql><![CDATA[select * 
 from GV$ASM_DISK_STAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-					<binds>
-						<bind id="GROUP_NUMBER">
-							<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-							<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-							<value><![CDATA[NULL_VALUE]]></value>
-							<bracket><![CDATA[null]]></bracket>
-						</bind>
-					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Disk IO stats]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7310,17 +7508,9 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 					<sql><![CDATA[select * 
 from GV$ASM_DISK_IOSTAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-					<binds>
-						<bind id="GROUP_NUMBER">
-							<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-							<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-							<value><![CDATA[NULL_VALUE]]></value>
-							<bracket><![CDATA[null]]></bracket>
-						</bind>
-					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Client]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7332,17 +7522,9 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 					<sql><![CDATA[select * 
 from GV$ASM_CLIENT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-					<binds>
-						<bind id="GROUP_NUMBER">
-							<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-							<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-							<value><![CDATA[NULL_VALUE]]></value>
-							<bracket><![CDATA[null]]></bracket>
-						</bind>
-					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Diskgroup stats]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7354,17 +7536,9 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 					<sql><![CDATA[select * 
 from GV$ASM_DISKGROUP_STAT
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-					<binds>
-						<bind id="GROUP_NUMBER">
-							<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-							<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-							<value><![CDATA[NULL_VALUE]]></value>
-							<bracket><![CDATA[null]]></bracket>
-						</bind>
-					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Template]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7376,17 +7550,9 @@ where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
 					<sql><![CDATA[select * 
 from GV$ASM_TEMPLATE
 where GROUP_NUMBER=:GROUP_NUMBER or :GROUP_NUMBER is null]]></sql>
-					<binds>
-						<bind id="GROUP_NUMBER">
-							<prompt><![CDATA[GROUP_NUMBER]]></prompt>
-							<tooltip><![CDATA[GROUP_NUMBER]]></tooltip>
-							<value><![CDATA[NULL_VALUE]]></value>
-							<bracket><![CDATA[null]]></bracket>
-						</bind>
-					</binds>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Operation]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7410,24 +7576,6 @@ from gv$asm_operation a
 				<TYPE><![CDATA[horizontal]]></TYPE>
 			</CustomValues>
 			<query>
-				<sql><![CDATA[SELECT typ, Tablespace_LogGroup, SUM(gb) GB, sum(files) as files FROM
-(
-SELECT 'Datafiles' typ, tablespace_name Tablespace_LogGroup,  ROUND(  bytes/1024/1024/1024, 2 ) GB, 1 as files
-  FROM dba_data_files
-UNION ALL
-SELECT 'Tempfiles' typ, tablespace_name Tablespace_LogGroup, ROUND( bytes/1024/1024/1024, 2 ) GB, 1 as files
-  FROM dba_temp_files
-UNION  ALL
-SELECT 'Logfiles' typ, to_char(group#) Tablespace_LogGroup, ROUND( bytes*members/1024/1024/1024, 2 ) GB, members as files
-  FROM v$log
-UNION ALL
-SELECT 'Controlfiles' typ, 'Controlfile' Tablespace_LogGroup, ROUND( BLOCK_SIZE*FILE_SIZE_BLKS/1024/1024/1024, 2 ) GB, 1 as files
-  FROM v$controlfile
-)
-GROUP BY ROLLUP(typ, Tablespace_LogGroup)
-order by typ, Tablespace_LogGroup, GB desc]]></sql>
-			</query>
-			<query>
 				<sql><![CDATA[SELECT typ, con_id, Tablespace_LogGroup, SUM(gb) GB, sum(files) as files FROM
 (
 SELECT 'Datafiles' typ, con_id, tablespace_name Tablespace_LogGroup,  ROUND(  bytes/1024/1024/1024, 2 ) GB, 1 as files
@@ -7445,7 +7593,7 @@ SELECT 'Controlfiles' typ, null, 'Controlfile' Tablespace_LogGroup, ROUND( BLOCK
 GROUP BY ROLLUP(typ, con_id, Tablespace_LogGroup)
 order by typ, con_id, Tablespace_LogGroup, GB desc]]></sql>
 			</query>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[DataFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7455,9 +7603,9 @@ order by typ, con_id, Tablespace_LogGroup, GB desc]]></sql>
 				</CustomValues>
 				<query>
 					<sql><![CDATA[SELECT *
-FROM dba_data_files
-where TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL
-ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
+FROM cdb_data_files
+where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) and (CON_ID= :CON_ID OR :CON_ID IS NULL))
+ORDER BY CON_ID, TABLESPACE_NAME, FILE_ID]]></sql>
 					<binds>
 						<bind id="TABLESPACE_LOGGROUP">
 							<prompt><![CDATA[TABLESPACE_LOGGROUP]]></prompt>
@@ -7465,16 +7613,16 @@ ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
 							<value><![CDATA[NULL_VALUE]]></value>
 							<bracket><![CDATA[null]]></bracket>
 						</bind>
+						<bind id="CON_ID">
+							<prompt><![CDATA[CON_ID]]></prompt>
+							<tooltip><![CDATA[CON_ID]]></tooltip>
+							<value><![CDATA[NULL_VALUE]]></value>
+							<bracket><![CDATA[null]]></bracket>
+						</bind>
 					</binds>
 				</query>
-				<query>
-					<sql><![CDATA[SELECT *
-FROM cdb_data_files
-where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) and (CON_ID= :CON_ID OR :CON_ID IS NULL))
-ORDER BY CON_ID, TABLESPACE_NAME, FILE_ID]]></sql>
-				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[TempFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7484,18 +7632,12 @@ ORDER BY CON_ID, TABLESPACE_NAME, FILE_ID]]></sql>
 				</CustomValues>
 				<query>
 					<sql><![CDATA[SELECT *
-  FROM dba_temp_files
-where TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL
-ORDER BY TABLESPACE_NAME, FILE_ID]]></sql>
-				</query>
-				<query>
-					<sql><![CDATA[SELECT *
   FROM cdb_temp_files
 where ((TABLESPACE_NAME= :TABLESPACE_LOGGROUP OR :TABLESPACE_LOGGROUP IS NULL) and (CON_ID= :CON_ID OR :CON_ID IS NULL))
 ORDER BY con_id, TABLESPACE_NAME, FILE_ID]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[LogGroups]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7505,12 +7647,12 @@ ORDER BY con_id, TABLESPACE_NAME, FILE_ID]]></sql>
 				</CustomValues>
 				<query>
 					<sql><![CDATA[SELECT *
-  FROM v$log
+  FROM gv$log
 where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) IS NULL)
 ORDER BY group#, thread#]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[LogFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7525,7 +7667,7 @@ where ( group#= TO_NUMBER(REGEXP_SUBSTR(:TABLESPACE_LOGGROUP, '^\d+')) OR TO_NUM
 ORDER BY group#, MEMBER]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="plsql-dbms_output" enable="true">
+			<display id="null" type="" style="plsql-dbms_output" enable="true">
 				<name><![CDATA[LogSwitchHeatMap]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7691,7 +7833,7 @@ BEGIN
 END;]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[LogSwitchHistory]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7705,7 +7847,7 @@ from gv$log_history
 order by sequence# desc]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[ArchivedLogs]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7719,7 +7861,7 @@ GV$ARCHIVED_LOG
 order by recid desc]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[ControlFiles]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7733,7 +7875,7 @@ order by recid desc]]></sql>
 ORDER by name]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[DiagTraceFile]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7746,7 +7888,7 @@ ORDER by name]]></sql>
 from GV$DIAG_TRACE_FILE]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Tablespaces]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7777,7 +7919,7 @@ from cdb_tablespaces ts
 order by ts.con_id, ts.tablespace_name]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[TablespacesSizing]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7809,7 +7951,7 @@ GROUP BY m.con_id, m.tablespace_name
 order by 1,2]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[FreeUsedSpace]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7848,7 +7990,7 @@ order by 1,2]]></sql>
  order by 1,2]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[TablespaceMap]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7867,7 +8009,7 @@ order by 1,2]]></sql>
  order by file_id, first_block desc]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[Segments]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7882,7 +8024,7 @@ order by 1,2]]></sql>
  order by bytes desc]]></sql>
 				</query>
 			</display>
-			<display id="" type="" style="Table" enable="true">
+			<display id="null" type="" style="Table" enable="true">
 				<name><![CDATA[FilesToResize]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
@@ -7916,6 +8058,80 @@ where a.file_id = b.file_id(+) and
       --and ceil(blocks * c.block_size / 1024 / 1024) - ceil((nvl(hwm, 1) * c.block_size) / 1024 / 1024) > 0
 	   --and tablespace_name='EXAMPLE'
 order by a.tablespace_name, a.file_id]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="Table" enable="true">
+				<name><![CDATA[FilesToResize2]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+					<TYPE><![CDATA[horizontal]]></TYPE>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[with
+ hwm as (
+  -- get highest block id from each datafiles ( from x$ktfbue as we don't need all joins from dba_extents )
+  select /*+ materialize */ ktfbuesegtsn ts#,ktfbuefno relative_fno,max(ktfbuebno+ktfbueblks-1) hwm_blocks
+  from sys.x$ktfbue group by ktfbuefno,ktfbuesegtsn
+ ),
+ hwmts as (
+  -- join ts# with tablespace_name
+  select name tablespace_name,relative_fno,hwm_blocks
+  from hwm join v$tablespace using(ts#)
+ ),
+ hwmdf as (
+  -- join with datafiles, put 5M minimum for datafiles with no extents
+  select file_name,nvl(hwm_blocks*(bytes/blocks),5*1024*1024) hwm_bytes,bytes,autoextensible,maxbytes
+  from hwmts right join dba_data_files using(tablespace_name,relative_fno)
+ )
+select
+ case when autoextensible='YES' and maxbytes>=bytes
+ then -- we generate resize statements only if autoextensible can grow back to current size
+  '/* reclaim '||to_char(ceil((bytes-hwm_bytes)/1024/1024),999999)
+   ||'M from '||to_char(ceil(bytes/1024/1024),999999)||'M  '
+   ||'alter database datafile '''||file_name||''' resize '||ceil(hwm_bytes/1024/1024)||'M;'
+ else -- generate only a comment when autoextensible is off
+  '/* reclaim '||to_char(ceil((bytes-hwm_bytes)/1024/1024),999999)
+   ||'M from '||to_char(ceil(bytes/1024/1024),999999)
+   ||'M after setting autoextensible maxsize higher than current size for file '
+   || file_name||' */'
+ end SQL,
+ to_char(ceil(bytes/1024/1024),999999) current_size_MB,
+ to_char(ceil((hwm_bytes)/1024/1024),999999) target_size_MB,
+ to_char(ceil((bytes-hwm_bytes)/1024/1024),999999) diff_MB,
+ 'SQLDEV:GAUGE:0:100:0:0:'||((hwm_bytes/bytes)*100)  as current_and_resized
+from hwmdf
+--where
+-- bytes-hwm_bytes>1024*1024 -- resize only if at least 1MB can be reclaimed
+order by bytes-hwm_bytes desc]]></sql>
+				</query>
+			</display>
+			<display id="null" type="" style="plsql-dbms_output" enable="true">
+				<name><![CDATA[FreeInTables]]></name>
+				<description><![CDATA[]]></description>
+				<tooltip><![CDATA[]]></tooltip>
+				<drillclass><![CDATA[]]></drillclass>
+				<CustomValues>
+				</CustomValues>
+				<query>
+					<sql><![CDATA[set serveroutput on
+declare
+ unf number; unfb number; fs1 number; fs1b number; fs2 number; fs2b number; fs3 number; fs3b number; fs4 number; fs4b number; full number; fullb number; 
+begin
+ for i in (select * from (select * from dba_segments where segment_subtype='ASSM' and segment_type in (
+  'TABLE','TABLE PARTITION','TABLE SUBPARTITION','CLUSTER','LOB','LOB PARTITION','LOB SUBPARTITION'
+ ) order by bytes desc) where 10>=rownum)
+ loop
+  begin
+   dbms_space.space_usage(i.owner,i.segment_name,i.segment_type,unf,unfb,fs1,fs1b,fs2,fs2b,fs3,fs3b,fs4,fs4b,full,fullb,partition_name=>i.partition_name);
+   dbms_output.put_line(to_char((unfb+fs1b+fs2b*0.25+fs3b*0.5+fs4b*0.75)/1024/1024/1024,'999G999D999')||' GB free in '||i.segment_type||' "'||i.owner||'"."'||i.segment_name||'" partition "'||i.partition_name||'"');
+  exception
+   when others then dbms_output.put_line(i.segment_type||' "'||i.owner||'"."'||i.segment_name||'" partition "'||i.partition_name||'": '||sqlerrm);
+  end; 
+ end loop;
+end;
+/]]></sql>
 				</query>
 			</display>
 		</display>
@@ -8372,8 +8588,8 @@ order by con_id, owner, segment_name, partition_name]]></sql>
 	</folder>
 	<folder>
 		<name><![CDATA[Data Pump]]></name>
-		<tooltip><![CDATA[]]></tooltip>
-		<description><![CDATA[]]></description>
+		<tooltip><![CDATA[Data Pump]]></tooltip>
+		<description><![CDATA[ ]]></description>
 			<display id="7bd9865a-019c-1000-8001-ac19017ddfb0" type="" style="Table" enable="true">
 			<name><![CDATA[Data Pump Jobs]]></name>
 			<description><![CDATA[]]></description>
@@ -8386,7 +8602,7 @@ order by con_id, owner, segment_name, partition_name]]></sql>
 				<sql><![CDATA[select * 
 from CDB_DATAPUMP_JOBS]]></sql>
 			</query>
-			<display id="null" type="" style="Table" enable="true">
+			<display id="" type="" style="Table" enable="true">
 				<name><![CDATA[DATAPUMP_SESSIONS]]></name>
 				<description><![CDATA[]]></description>
 				<tooltip><![CDATA[]]></tooltip>
