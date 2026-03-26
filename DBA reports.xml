@@ -6319,7 +6319,7 @@ ORDER BY 1 DESC ;]]></sql>
 			</query>
 		</display>
 		<display id="2ad06896-019d-1000-8004-ac1901a55cd2" type="" style="plsql-dbms_output" enable="true">
-			<name><![CDATA[Log Switch Heat Map - gigabytes]]></name>
+			<name><![CDATA[Log Switch Heat Map - gigabytes of archivelogs]]></name>
 			<description><![CDATA[]]></description>
 			<tooltip><![CDATA[]]></tooltip>
 			<drillclass><![CDATA[]]></drillclass>
